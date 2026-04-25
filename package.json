@@ -1,0 +1,42 @@
+{
+  "name": "the-fixi-project",
+  "version": "0.0.1",
+  "description": "The Fixi Project - the all-in-one bundle of fixi, moxi, ssexi, paxi, and rexi",
+  "main": "dist/the-fixi-project.js",
+  "files": [
+    "dist/the-fixi-project.js",
+    "dist/the-fixi-project.min.js",
+    "dist/the-fixi-project.min.js.map",
+    "dist/the-fixi-project.min.js.br"
+  ],
+  "keywords": [
+    "fixi",
+    "moxi",
+    "ssexi",
+    "paxi",
+    "rexi",
+    "htmx",
+    "hypermedia",
+    "html"
+  ],
+  "author": "1cg",
+  "license": "BSD-0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bigskysoftware/the-fixi-project.git"
+  },
+  "scripts": {
+    "clone": "for name in fixi moxi ssexi paxi rexi; do [ -d \"$name\" ] || git clone \"https://github.com/bigskysoftware/$name.git\" \"$name\"; done",
+    "test": "node _scripts/test.mjs",
+    "status": "node _scripts/status.mjs",
+    "serve": "(sleep 0.3 && open http://localhost:8000) & python3 -m http.server 8000 --directory www",
+    "demo": "npm run build --silent && node demo/server.mjs",
+    "build": "for f in moxi/moxi.js fixi/fixi.js ssexi/ssexi.js paxi/paxi.js rexi/rexi.js; do echo \"// $f\"; cat \"$f\"; echo \";\"; done > dist/the-fixi-project.js && terser moxi/moxi.js fixi/fixi.js ssexi/ssexi.js paxi/paxi.js rexi/rexi.js --compress --mangle --source-map 'includeSources=true,url=\"the-fixi-project.min.js.map\"' -o dist/the-fixi-project.min.js && node -e \"const fs=require('fs'),zlib=require('zlib');fs.writeFileSync('dist/the-fixi-project.min.js.br',zlib.brotliCompressSync(fs.readFileSync('dist/the-fixi-project.min.js')))\"",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "eta": "^4.5.1",
+    "playwright": "^1.49.0",
+    "terser": "^5.46.2"
+  }
+}

@@ -1,0 +1,32 @@
+h1 { margin-bottom: 0.1em; }
+
+#response {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.8em 1em;
+    background: #fff;
+    height: 320px;
+    overflow-y: auto;
+    margin-bottom: 0.8em;
+}
+
+.you { font-weight: 600; margin-top: 0.6em; }
+.you:first-child { margin-top: 0; }
+.you::before { content: 'You: '; color: #888; font-weight: 400; }
+
+.tok { opacity: 0; animation: fade 0.25s forwards; }
+@keyframes fade { to { opacity: 1 } }
+
+form { display: flex; gap: 0.4em; }
+input[name=q] { flex: 1; padding: 0.45em 0.6em; font: inherit; border: 1px solid #ccc; border-radius: 4px; }
+button {
+    background: #2563eb;
+    color: #fff;
+    border: 0;
+    border-radius: 4px;
+    padding: 0.45em 1em;
+    cursor: pointer;
+    font: inherit;
+}
+button:hover { filter: brightness(1.08); }
+:disabled { opacity: 0.5; cursor: not-allowed; }

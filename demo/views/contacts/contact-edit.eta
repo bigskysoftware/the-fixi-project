@@ -1,0 +1,21 @@
+<form class="row editing" id="c-<%= c.id %>"
+      fx-action="/contacts/<%= c.id %>"
+      fx-method="PUT">
+    <div class="cell">
+        <input name="name"  value="<%= c.name %>"  autofocus required>
+    </div>
+    <div class="cell">
+        <input name="email" value="<%= c.email %>" type="email" required>
+    </div>
+    <div class="cell">
+        <input name="phone" value="<%= c.phone %>" type="tel"   required>
+    </div>
+    <div class="actions">
+        <button live="this.disabled = !this.form.checkValidity()">save</button>
+        <button type="button"
+                fx-action="/contacts/<%= c.id %>"
+                fx-target="#c-<%= c.id %>">
+            cancel
+        </button>
+    </div>
+</form>

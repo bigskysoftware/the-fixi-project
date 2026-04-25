@@ -1,0 +1,36 @@
+<% layout('../_layout', { title: 'Contacts', page: 'contacts' }) %>
+
+<h1 xmlns:on-fx="http://www.w3.org/1999/xhtml">&#x1F4D2; Contacts</h1>
+
+<div class="contacts">
+    <div class="toolbar">
+        <input id="search" name="q" type="search" placeholder="Search name, email, phone&hellip;"
+               autofocus
+               fx-action="/contacts"
+               fx-trigger="search"
+               fx-target="#contacts-list"
+               fx-swap="morph"
+               on-input="await debounce(180); trigger('search')">
+
+        <form class="new" fx-action="/contacts"
+                          fx-method="POST"
+                          fx-target="#contacts-list"
+                          fx-swap="morph"
+                          on-fx:swapped="this.reset(); q('first input').focus()">
+            <input name="name"  placeholder="New name" required>
+            <input name="email" placeholder="email"    type="email" required>
+            <input name="phone" placeholder="phone"    type="tel"   required>
+            <button live="this.disabled = !this.form.checkValidity()">+ Add</button>
+        </form>
+    </div>
+
+    <div class="row header">
+        <div>Name</div>
+        <div>Email</div>
+        <div>Phone</div>
+        <div></div>
+    </div>
+
+    <%~ include('contacts-list', { contacts }) %>
+
+</div>

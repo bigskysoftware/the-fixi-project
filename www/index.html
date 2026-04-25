@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Fixi Project</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .installer {
+            background: #f4f4f5;
+            padding: 0.8em 1em;
+            border-radius: 4px;
+            font-size: 0.9em;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+
+        .installer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5em;
+            padding-bottom: 0.4em;
+            margin-bottom: 0.5em;
+            border-bottom: 1px solid #d4d4d6;
+        }
+
+        .installer-header label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .installer-actions {
+            display: flex;
+            gap: 0.4em;
+        }
+
+        .installer button {
+            background: linear-gradient(#ffffff, #e8e8ea);
+            color: #1a1a1a;
+            border: 1px solid #b8b8bc;
+            border-radius: 4px;
+            padding: 0.25em 0.8em;
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.9em;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 1px 2px rgba(0,0,0,0.12);
+        }
+
+        .installer button:hover { background: linear-gradient(#ffffff, #f0f0f2); }
+
+        .installer button:active {
+            background: linear-gradient(#e0e0e2, #ededef);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.18) inset;
+        }
+
+        .install-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+            font-family: ui-monospace, monospace;
+            cursor: pointer;
+            padding: 0.2em 0;
+            transition: opacity 0.15s;
+        }
+
+        .install-row:has(.pick:not(:checked)) { opacity: 0.35; }
+
+        .install-row code {
+            background: transparent;
+            padding: 0;
+            font-size: 0.95em;
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .install-row .copy {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 0.82em;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            flex-shrink: 0;
+        }
+        .install-row .copy:hover { text-decoration: underline; }
+    </style>
+    <script>
+        // include moxi.js inline
+    (()=>{
+        let doc = document
+        if(doc.__moxi_mo) return
+        let liveFns = new Set(), pending = false
+        let recompute = ()=>{
+            if (pending) return
+            pending = true
+            queueMicrotask(()=>{liveFns.forEach((f)=>f()); setTimeout(()=>pending = false)})
+        }
+        doc.__moxi_mo = new MutationObserver((recs)=>{
+            recs.forEach((r)=>r.type === "childList" && r.addedNodes.forEach((n)=>process(n)))
+            recompute()
+        })
+        let PREFIX = "on-"
+        let XPATH = "descendant-or-self::*[@live or @*[starts-with(name(),'on-')]]"
+        let AF = async function(){}.constructor, HARGS = ["q", "trigger", "wait", "transition", "take", "debounce"]
+        let fire = (elt, type, detail, bub)=>elt.dispatchEvent(new CustomEvent(type, {detail, cancelable:1, bubbles:bub??1, composed:1}))
+        let transition = (fn)=>doc.startViewTransition ? doc.startViewTransition(fn) : fn()
+        let take = (cls, from, to)=>{doc.querySelectorAll(from).forEach((e)=>e.classList.remove(cls)); to.classList.add(cls)}
+        let DB = Symbol()
+        let mkDb = ()=>{let last = 0, j; return (ms)=>new Promise((r,rj)=>{j?.(DB); j = rj; let id = ++last; setTimeout(()=>id === last && (j = null, r()), ms)})}
+        let ignore = (elt)=>elt.closest("[mx-ignore]")
+        let one = (x)=>x?[x]:[]
+        let POS = {before:"beforebegin",after:"afterend",start:"afterbegin",end:"beforeend"}
+        let proxy = (elts)=>new Proxy({}, {
+            get:(_,p)=>{
+                if (p === "count") return elts.length
+                if (p === "arr") return ()=>elts.slice()
+                if (p === Symbol.iterator) return ()=>elts.values()
+                if (p === "trigger") return (t,d)=>elts.forEach((e)=>fire(e,t,d))
+                if (p === "insert") return (pos,s)=>elts.forEach((e)=>e.insertAdjacentHTML(POS[pos],s))
+                let v = elts[0]?.[p]
+                if (typeof v === "function") return (...a)=>elts.map((e)=>e[p](...a))[0]
+                if (v && typeof v === "object") return proxy(elts.map((e)=>e[p]))
+                return v
+            },
+            set:(_,p,v)=>(elts.forEach((e)=>e[p]=v),true)
+        })
+        let mkq = (ctx)=>(sel)=>{
+            let im = sel.match(/^(.+)\s+in\s+(.+)$/), root = doc
+            if (im){ sel = im[1]; root = im[2] === "this" ? ctx : doc.querySelector(im[2]) }
+            if (!root) return proxy([])
+            let m = sel.match(/^(next|prev|closest|first|last)\s+(.+)$/), elts
+            if (m){
+                let [,d,s] = m, cdp = (e)=>ctx.compareDocumentPosition(e)
+                if (d === "closest") elts = one(ctx.closest(s))
+                else {
+                    let all = [...root.querySelectorAll(s)]
+                    if (d === "first") elts = all.slice(0,1)
+                    else if (d === "last") elts = all.slice(-1)
+                    else if (d === "next") elts = one(all.find((e)=>cdp(e) & 4))
+                    else elts = one(all.reverse().find((e)=>cdp(e) & 2))
+                }
+            } else elts = [...root.querySelectorAll(sel)]
+            return proxy(elts)
+        }
+        let init = (elt)=>{
+            if (elt.__moxi || ignore(elt)) return
+            if (!fire(elt, "mx:init", {})) return
+            elt.__moxi = {}
+            let q = mkq(elt), trigger = (t,d)=>fire(elt,t,d)
+            let wait = (x)=>new Promise((r)=>typeof x === "number" ? setTimeout(r,x) : elt.addEventListener(x,r,{once:1}))
+            let liveRuns = []
+            for (let a of elt.attributes){
+                if (a.name === "live"){
+                    let fn = new AF(...HARGS, a.value)
+                    let debounce = mkDb()
+                    let run = ()=>elt.isConnected ? fn.call(elt, q, trigger, wait, transition, take, debounce) : liveFns.delete(run)
+                    liveFns.add(run)
+                    liveRuns.push(run)
+                } else if (a.name.startsWith(PREFIX)){
+                    let [name, ...mods] = a.name.slice(3).split(".")
+                    let has = (m)=>mods.includes(m), h = has("halt"), debounce = mkDb()
+                    let target = has("outside") ? doc : elt
+                    let opts = {capture: has("capture"), passive: has("passive")}
+                    let fn = new AF("event", ...HARGS, `with(event?.detail||{}){${a.value}}`)
+                    let handler = elt.__moxi[name] = (evt)=>{
+                        if (evt && (has("self") && evt.target !== elt || has("outside") && elt.contains(evt.target))) return
+                        if (h || has("prevent")) evt?.preventDefault()
+                        if (h || has("stop")) evt?.stopPropagation()
+                        if (has("once")) target.removeEventListener(name, handler, opts)
+                        return fn.call(elt, evt, q, trigger, wait, transition, take, debounce).catch((e)=>{if(e!==DB) throw e})
+                    }
+                    if (name === "init") handler()
+                    else target.addEventListener(name, handler, opts)
+                }
+            }
+            liveRuns.forEach((r)=>r())
+            fire(elt, "mx:inited", {}, false)
+        }
+        let process = (n)=>{
+            if (n.nodeType !== 1 || ignore(n)) return
+            let r = doc.evaluate(XPATH, n, null, 7, null)
+            for (let i = 0; i < r.snapshotLength; i++) init(r.snapshotItem(i))
+        }
+        doc.addEventListener("mx:process", (evt)=>process(evt.target))
+        doc.addEventListener("DOMContentLoaded", ()=>{
+            doc.__moxi_mo.observe(doc.documentElement, {childList:1, subtree:1, attributes:1, characterData:1})
+            doc.addEventListener("input", recompute, true)
+            doc.addEventListener("change", recompute, true)
+            process(doc.body)
+        })
+    })()
+    </script>
+</head>
+<body>
+
+<h1><span class="ico">&#x1F6B2;</span> The Fixi Project</h1>
+
+<p>The fixi project is collection of small web libraries, each one being a <a href="https://www.youtube.com/watch?v=8BNP126zgPU">lightweight</a>
+    take on something else <a href="https://four.htmx.org/about">we've</a> built.</p>
+
+<p>Each library is <a href="https://quoteinvestigator.com/2014/05/24/art-limit/">constrained</a> to an <em>unminified,
+    uncompressed</em> source size that is smaller than (the excellent) <a href="https://preactjs.com/">Preact</a>
+    library's .min.gz'd size (<a href="https://bundlephobia.com/package/preact">~4.7kb</a>).</p>
+
+<p>The libraries are:</p>
+
+<ul>
+    <li><span class="ico">&#x1F6B2;</span> <a href="https://github.com/bigskysoftware/fixi"><code>fixi</code></a>
+        <small>(3.4kb raw, 1.2kb brotli)</small> inspired by
+        <a href="https://github.com/bigskysoftware/htmx">htmx</a>, <a href="https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127">supercharges</a> your HTML</li>
+    <li><span class="ico">&#x1F94A;</span> <a href="https://github.com/bigskysoftware/moxi"><code>moxi</code></a>
+        <small>(4.6kb raw, 1.8kb brotli)</small> inspired by
+        <a href="https://github.com/bigskysoftware/_hyperscript">hyperscript</a>, provides
+        <a href="https://htmx.org/essays/locality-of-behaviour/">inline</a> scripting and DOM-based reactivity</li>
+    <li><span class="ico">&#x1F4E1;</span> <a href="https://github.com/bigskysoftware/ssexi"><code>ssexi</code></a>
+        <small>(4.1kb raw, 1.4kb brotli)</small> inspired by
+        <a href="https://github.com/bigskysoftware/htmx/blob/four/src/ext/hx-sse.js">htmx's SSE extension</a>, provides
+        streaming HTML & events for fixi.js</li>
+    <li><span class="ico">&#x267B;&#xFE0F;</span> <a href="https://github.com/bigskysoftware/paxi"><code>paxi</code></a>
+        <small>(1.5kb raw, 0.6kb brotli)</small> inspired by
+        <a href="https://github.com/bigskysoftware/idiomorph">idiomorph</a>, provides DOM patching/morphing and a
+        <code>morph</code> swap for fixi.js</li>
+    <li><span class="ico">&#x1F415;</span> <a href="https://github.com/bigskysoftware/rexi"><code>rexi</code></a>
+        <small>(4.3kb raw, 1.4kb brotli)</small> inspired by
+        <a href="https://hyperscript.org/commands/fetch/">hyperscript's <code>fetch</code> command</a>, provides a set of
+        ergonomic <code>fetch()</code> wrappers to make issuing one-off HTTP requests nicer.</li>
+</ul>
+
+<h2 id="installing"><a href="#installing">Installing</a></h2>
+
+<p>Each library is a single standalone script. Pick whichever you need and drop it into a page:</p>
+
+<div class="installer">
+    <div class="installer-header">
+        <label>
+            <input type="checkbox" id="install-all" checked
+                   live="
+                       let b=q('.pick').arr();
+                       let n=b.filter(x=>x.checked).length;
+                       this.checked=n===b.length;
+                       this.indeterminate=n>0&&n<b.length
+                   "
+                   on-click="for (let x of q('.pick')) x.checked=this.checked">
+            select all
+        </label>
+        <div class="installer-actions">
+            <button on-click="
+                let parts=q('.pick').arr().filter(x=>x.checked).map(x=>{
+                    let n=x.dataset.url.split('/').pop().replace(/\.js$/, '');
+                    return `echo &quot;// ${n} @ ${x.dataset.ver}&quot;; curl -s ${x.dataset.url}; echo`
+                }).join('; ');
+                await navigator.clipboard.writeText(`{ ${parts}; } > fixi-distro.js`);
+                let t=this.innerText;
+                this.innerText='copied!';
+                await wait(1200);
+                this.innerText=t
+            ">cat</button>
+            <button on-click="
+                let s=q('.pick').arr().filter(x=>x.checked).map(x=>{
+                    let f=x.dataset.url.split('/').pop().replace(/\.js$/, `@${x.dataset.ver}.js`);
+                    return `curl -o ${f} ${x.dataset.url}`
+                }).join('\n');
+                await navigator.clipboard.writeText(s);
+                let t=this.innerText;
+                this.innerText='copied!';
+                await wait(1200);
+                this.innerText=t
+            ">vendor</button>
+            <button on-click="
+                let p=q('.pick').arr().filter(x=>x.checked).map(x=>`${x.dataset.pkg}@${x.dataset.ver}`).join(' ');
+                await navigator.clipboard.writeText(`npm install ${p}`);
+                let t=this.innerText;
+                this.innerText='copied!';
+                await wait(1200);
+                this.innerText=t
+            ">npm</button>
+            <button on-click="
+                let s=q('.pick').arr().filter(x=>x.checked).map(x=>`&lt;script src=&quot;${x.dataset.url}&quot; integrity=&quot;${x.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`).join('\n');
+                await navigator.clipboard.writeText(s);
+                let t=this.innerText;
+                this.innerText='copied!';
+                await wait(1200);
+                this.innerText=t
+            ">CDN</button>
+        </div>
+    </div>
+    <label class="install-row">
+        <input type="checkbox" class="pick" checked
+               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.0.1/moxi.js"
+               data-sri="sha256-RgoYY/abzRDXHNFdoLaSRfqpJX9JtuXmM1GECDQDjig="
+               data-pkg="@bigskysoftware/moxi-js"
+               data-ver="0.0.1">
+        <code>&lt;script src="...<b>@0.0.1/moxi.js</b>"&gt;&lt;/script&gt;</code>
+        <a class="copy" href="#" on-click.halt="
+            let p=this.closest('.install-row').querySelector('.pick');
+            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
+        ">copy</a>
+    </label>
+    <label class="install-row">
+        <input type="checkbox" class="pick" checked
+               data-url="https://cdn.jsdelivr.net/npm/fixi-js@0.9.3/fixi.js"
+               data-sri="sha256-Qalmv6iqaAnrglOx2AWSoLfJFmXLGtjAIdBgsLc3bgg="
+               data-pkg="fixi-js"
+               data-ver="0.9.3">
+        <code>&lt;script src="...<b>@0.9.3/fixi.js</b>"&gt;&lt;/script&gt;</code>
+        <a class="copy" href="#" on-click.halt="
+            let p=this.closest('.install-row').querySelector('.pick');
+            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
+        ">copy</a>
+    </label>
+    <label class="install-row">
+        <input type="checkbox" class="pick" checked
+               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/ssexi-js@0.0.1/ssexi.js"
+               data-sri="sha256-/Apa7x6OzOp7AwjUoGNlM7n1Rma98JB515fUeJ/yjrM="
+               data-pkg="@bigskysoftware/ssexi-js"
+               data-ver="0.0.1">
+        <code>&lt;script src="...<b>@0.0.1/ssexi.js</b>"&gt;&lt;/script&gt;</code>
+        <a class="copy" href="#" on-click.halt="
+            let p=this.closest('.install-row').querySelector('.pick');
+            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
+        ">copy</a>
+    </label>
+    <label class="install-row">
+        <input type="checkbox" class="pick" checked
+               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/paxi-js@0.0.1/paxi.js"
+               data-sri="sha256-EAglheIIvlwnF73UCBBTSIpd+Y9aDuzMJmya6UstvuU="
+               data-pkg="@bigskysoftware/paxi-js"
+               data-ver="0.0.1">
+        <code>&lt;script src="...<b>@0.0.1/paxi.js</b>"&gt;&lt;/script&gt;</code>
+        <a class="copy" href="#" on-click.halt="
+            let p=this.closest('.install-row').querySelector('.pick');
+            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
+        ">copy</a>
+    </label>
+    <label class="install-row">
+        <input type="checkbox" class="pick" checked
+               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/rexi-js@0.0.1/rexi.js"
+               data-sri="sha256-cCEegdCXeB/kzcjjQ07v3ud2DUtKKhaCArdCI/mZAX4="
+               data-pkg="@bigskysoftware/rexi-js"
+               data-ver="0.0.1">
+        <code>&lt;script src="...<b>@0.0.1/rexi.js</b>"&gt;&lt;/script&gt;</code>
+        <a class="copy" href="#" on-click.prevent.stop="
+            let p=this.closest('.install-row').querySelector('.pick');
+            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
+        ">copy</a>
+    </label>
+</div>
+
+<p>NOTE: you will want to load <code>moxi</code> <em>before</em> <code>fixi</code> so its <code>on-fx:init</code> and
+    <code>on-fx:process</code> handlers are registered before fixi dispatches those events on page load.</p>
+
+<h2 id="all-in-one"><a href="#all-in-one"><span class="ico">&#x1F9F0;</span> The Fixi Project All-in-One <small>(4.3kb brotli)</small></a></h2>
+
+<p>All five libraries are also available pre-concatenated, minified, and brotli-compressed in a single file:</p>
+<div class="installer">
+    <div class="installer-header">
+        <div class="installer-actions" style="margin-left:auto">
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project/dist/the-fixi-project.min.js"
+                    on-click="
+                        let s=`&lt;script src=&quot;${this.dataset.url}&quot;&gt;&lt;/script&gt;`;
+                        await navigator.clipboard.writeText(s);
+                        let t=this.innerText;
+                        this.innerText='copied!';
+                        await wait(1200);
+                        this.innerText=t
+                    ">CDN</button>
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project/dist/the-fixi-project.min.js"
+                    on-click="
+                        let s=`curl -O ${this.dataset.url}`;
+                        await navigator.clipboard.writeText(s);
+                        let t=this.innerText;
+                        this.innerText='copied!';
+                        await wait(1200);
+                        this.innerText=t
+                    ">vendor</button>
+        </div>
+    </div>
+    <div class="install-row">
+        <code>&lt;script src="https://cdn.jsdelivr.net/npm/the-fixi-project/dist/the-fixi-project.min.js"&gt;&lt;/script&gt;</code>
+    </div>
+</div>
+
+<p>Or via npm:</p>
+
+<pre><code>npm install the-fixi-project</code></pre>
+
+<h2>Docs</h2>
+
+<p>The docs for the project can be found <a href="docs.html">here</a>.</p>
+
+</body>
+</html>

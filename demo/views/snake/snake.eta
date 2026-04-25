@@ -1,0 +1,38 @@
+<% layout('../_layout', { title: 'Snake', page: 'snake' }) %>
+
+<h1>&#x1F40D; Snake</h1>
+<p class="hint">arrow keys (or buttons) steer &middot; the server runs the loop &middot; one ssexi stream fans the tick
+    out to <code>#board</code>, <code>#score</code>, <code>#status</code> &middot; rexi posts every direction change.
+    Open two tabs to fight over the snake.</p>
+
+<!-- one SSE connection; every frame is JSON-routed to a different element -->
+<div hidden
+     fx-action="/snake/stream"
+     fx-trigger="fx:inited"
+     fx-swap="innerHTML"></div>
+
+<section class="snake">
+    <div class="hud">
+        <div>Score: <span id="score">0</span></div>
+        <div id="status"><span class="ok">alive</span></div>
+    </div>
+    <div id="board" style="--w:<%= w %>;--h:<%= h %>"></div>
+    <div class="controls">
+        <button on-click="post('/snake/turn', {dir:'up'})">&#x25B2;</button>
+        <div class="row">
+            <button on-click="post('/snake/turn', {dir:'left'})">&#x25C0;</button>
+            <button on-click="post('/snake/turn', {dir:'right'})">&#x25B6;</button>
+        </div>
+        <button on-click="post('/snake/turn', {dir:'down'})">&#x25BC;</button>
+        <button class="restart" on-click="post('/snake/restart')">&#x21BB; Restart</button>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('keydown', (e) => {
+        let m = {ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right'}[e.key]
+        if (!m) return
+        e.preventDefault()
+        post('/snake/turn', {dir: m})
+    })
+</script>

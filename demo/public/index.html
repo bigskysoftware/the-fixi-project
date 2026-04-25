@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>fixi project demo</title>
+<style>
+    body { font: 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif; max-width: 640px; margin: 3em auto; padding: 0 1em; color: #1a1a1a; }
+    h1 { margin-bottom: 0.2em; }
+    p.intro { color: #555; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 0.8em 0; padding: 0.9em 1em; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 6px; }
+    li a { color: #2563eb; text-decoration: none; font-weight: 600; font-size: 1.05em; }
+    li a:hover { text-decoration: underline; }
+    li .sub { color: #666; font-size: 0.9em; margin-top: 0.3em; }
+    code { background: #f4f4f5; padding: 0.1em 0.35em; border-radius: 3px; font-size: 0.9em; }
+</style>
+</head>
+<body>
+
+<h1>fixi project demo</h1>
+<p class="intro">Small Node-backed demos exercising the all-in-one bundle (fixi + moxi + ssexi + paxi + rexi) against real server endpoints.</p>
+
+<ul>
+    <li>
+        <a href="/contacts.html">&#x1F4D2; Contacts CRUD</a>
+        <div class="sub">Searchable address book with inline editing. Active search via debounced <code>moxi</code> + custom <code>fx-trigger</code>; new contact <code>POST</code>, save <code>PUT</code>, remove <code>DELETE</code> through <code>fixi</code>; <code>paxi</code> morph keeps the search input focused while the list updates per keystroke.</div>
+    </li>
+    <li>
+        <a href="/items.html">&#x1F4CB; TodoMVC</a>
+        <div class="sub">Classic todo app: per-row toggle + delete, toggle-all, clear-completed, all/active/completed filters. <code>paxi</code> morph-swaps keep the list stable across every action; <code>moxi</code> drives the toggle-all indicator, the footer count, and the filter bar; server templates are <code>eta</code>.</div>
+    </li>
+    <li>
+        <a href="/bot.html">&#x1F916; Gibberish bot</a>
+        <div class="sub">A fake LLM that streams word-by-word nonsense via SSE. <code>fixi</code> sends the question as a POST that returns <code>text/event-stream</code>; <code>ssexi</code> appends each token; <code>moxi</code> manages the conversation log.</div>
+    </li>
+    <li>
+        <a href="/chat.html">&#x1F4AC; Chat</a>
+        <div class="sub">Shared chat room. <code>ssexi</code> streams messages in over SSE; <code>fixi</code> posts the compose form; <code>moxi</code> resets and refocuses after send. Open two tabs.</div>
+    </li>
+    <li>
+        <a href="/dashboard.html">&#x1F4CA; Live dashboard</a>
+        <div class="sub">One <code>ssexi</code> SSE stream, three panels, three different swap modes. Each message's <code>event:</code> field is JSON like <code>{"target":"#clock"}</code> so the server fans the same stream out to a clock (<code>innerHTML</code>), a metrics block (<code>innerHTML</code>), and an activity log (<code>beforeend</code>) without any extra connections.</div>
+    </li>
+    <li>
+        <a href="/snake.html">&#x1F40D; Snake</a>
+        <div class="sub">Server runs the game loop and ticks state on a timer. <code>ssexi</code> streams each tick out to <code>#board</code>, <code>#score</code>, and <code>#status</code> through the same connection; <code>rexi</code> posts every direction change as a <code>dir=...</code> form; <code>moxi</code> wires the arrow keys at <code>on-init</code>. Open two tabs and fight over the snake.</div>
+    </li>
+</ul>
+
+<p style="color:#888; font-size:0.9em">Source: <a href="https://github.com/bigskysoftware/fixi-project">bigskysoftware/fixi-project</a>. Start with <code>npm run demo</code> from the project root.</p>
+
+</body>
+</html>

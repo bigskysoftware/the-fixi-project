@@ -1,0 +1,19 @@
+<% layout('../_layout', { title: 'Gibberish bot', page: 'bot' }) %>
+
+<h1>&#x1F916; Gibberish bot</h1>
+<p class="hint">ask anything; the "bot" answers with word-by-word nonsense over SSE</p>
+
+<div id="response"
+     on-fx:sse:swapped="this.scrollTop = this.scrollHeight"></div>
+
+<form fx-action="/bot/ask"
+      fx-method="post"
+      fx-target="#response"
+      fx-swap="beforeend"
+      on-fx:before="q('input,button in this').disabled = true"
+      on-fx:after="this.reset();
+                   q('input,button in this').disabled = false;
+                   q('next input').focus()">
+    <input name="q" placeholder="ask the bot something" required autocomplete="off" autofocus>
+    <button>ask</button>
+</form>

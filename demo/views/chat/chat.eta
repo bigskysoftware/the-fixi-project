@@ -1,0 +1,21 @@
+<% layout('../_layout', { title: 'Chat', page: 'chat' }) %>
+
+<h1>&#x1F4AC; Chat</h1>
+<p class="hint">open this page in two tabs to watch the SSE broadcast</p>
+
+<!-- on fx:inited the log div opens an SSE connection to /chat/stream; ssexi appends each frame -->
+<div id="log"
+     fx-action="/chat/stream"
+     fx-trigger="fx:inited"
+     fx-swap="beforeend"
+     on-fx:sse:swapped="this.scrollTop = this.scrollHeight"></div>
+
+<!-- on-fx:after clears only the text input so the name persists between sends -->
+<form fx-action="/chat/send"
+      fx-method="post"
+      fx-swap="none"
+      on-fx:after="q('#msg').value = ''; q('#msg').focus()">
+    <input name="name" placeholder="your name" required>
+    <input id="msg" name="text" placeholder="message" required autocomplete="off">
+    <button>send</button>
+</form>

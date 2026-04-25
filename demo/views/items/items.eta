@@ -1,0 +1,59 @@
+<% layout('../_layout', { title: 'Todos', page: 'items' }) %>
+
+<h1>todos</h1>
+<p class="hint">fixi + paxi + moxi, all declarative</p>
+
+<section class="todoapp">
+    <form class="add"
+          fx-action="/items"
+          fx-method="post"
+          fx-target="#items"
+          fx-swap="morph"
+          on-fx:after="this.reset(); q('next input').focus()">
+        <input name="title" placeholder="what needs doing?" required autocomplete="off" autofocus>
+    </form>
+
+    <div class="main">
+        <div class="toggle-all-bar">
+            <input type="checkbox"
+                   id="toggle-all"
+                   live="let picks = q('.pick').arr();
+                         let done = picks.filter(x => x.checked).length;
+                         this.checked = picks.length && done === picks.length"
+                   fx-action="/items/toggle-all"
+                   fx-method="post"
+                   fx-target="#items"
+                   fx-swap="morph">
+            <label for="toggle-all">toggle all</label>
+        </div>
+        <%~ include('items-table', { items }) %>
+    </div>
+
+    <footer class="footer"
+            live="
+                let picks = q('.pick').arr();
+                let active = picks.filter(x => !x.checked).length;
+                let done   = picks.length - active;
+                q('.count in this').innerText = active + (active === 1 ? ' item' : ' items') + ' left';
+                q('.clear in this').hidden = done === 0
+            ">
+        <span class="count"></span>
+        <div class="filters"
+             on-click="
+                let f = event.target.dataset.filter;
+                if (!f) return;
+                q('.main').dataset.filter = f === 'all' ? '' : f;
+                q('.filters button in this').classList.remove('active');
+                event.target.classList.add('active')
+             ">
+            <button data-filter="all" class="active">all</button>
+            <button data-filter="active">active</button>
+            <button data-filter="completed">completed</button>
+        </div>
+        <button class="clear"
+                fx-action="/items/clear-completed"
+                fx-method="post"
+                fx-target="#items"
+                fx-swap="morph">clear completed</button>
+    </footer>
+</section>

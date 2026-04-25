@@ -1,0 +1,38 @@
+<% layout('../_layout', { title: 'Dashboard', page: 'dashboard' }) %>
+
+<h1>&#x1F4CA; Dashboard</h1>
+<p class="hint">one SSE stream, three panels, three different swap modes — ssexi routes each message to its own target via JSON event names</p>
+
+<!--
+  This invisible div opens the SSE connection on fx:inited. ssexi sees text/event-stream
+  responses and takes over: each message's `event:` field is JSON like
+    {"target":"#clock"}            -> uses the connection's default swap (innerHTML)
+    {"target":"#log","swap":"beforeend"}  -> per-message swap override
+  fx-swap="innerHTML" sets the connection-wide default; #log overrides per-message.
+-->
+<div hidden
+     fx-action="/dashboard/stream"
+     fx-trigger="fx:inited"
+     fx-swap="innerHTML"></div>
+
+<section class="panels">
+    <div class="panel">
+        <h3>Clock</h3>
+        <div class="body">
+            <div id="clock">--:--:--</div>
+        </div>
+    </div>
+    <div class="panel">
+        <h3>Metrics</h3>
+        <div class="body">
+            <div id="metrics">connecting...</div>
+        </div>
+    </div>
+    <div class="panel full">
+        <h3>Activity log</h3>
+        <div class="body">
+            <pre id="log"
+                 on-fx:sse:swapped="this.scrollTop = this.scrollHeight"></pre>
+        </div>
+    </div>
+</section>

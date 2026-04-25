@@ -1,0 +1,21 @@
+body {
+    font: 16px/1.5 -apple-system, BlinkMacSystemFont, sans-serif;
+    max-width: 640px;
+    margin: 2em auto;
+    padding: 0 1em;
+    color: #1a1a1a;
+    background: #fafafa;
+}
+
+a { color: #2563eb; }
+
+p.hint {
+    color: #888;
+    font-size: 0.85em;
+    margin: 0 0 1em;
+    text-align: center;
+}
+
+header.nav { text-align: center; padding-bottom: 0.8em; }
+header.nav a { color: #888; text-decoration: none; font-size: 0.85em; }
+header.nav a:hover { text-decoration: underline; }

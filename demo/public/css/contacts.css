@@ -1,0 +1,91 @@
+.contacts { max-width: 760px; }
+
+.contacts .toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em;
+    margin-bottom: 1em;
+}
+.contacts #search {
+    width: 100%;
+    padding: 0.55em 0.7em 0.55em 2.4em;
+    border: 1px solid #d4d4d8;
+    border-radius: 4px;
+    font: inherit;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 0.7em center / 1.05em 1.05em;
+}
+.contacts #search::-webkit-search-cancel-button { cursor: pointer; }
+
+.contacts form.new {
+    display: flex;
+    gap: 0.4em;
+    width: 100%;
+}
+.contacts form.new input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.5em 0.7em;
+    border: 1px solid #d4d4d8;
+    border-radius: 4px;
+    font: inherit;
+}
+.contacts form.new input:invalid { border-color: #fecaca; background: #fef2f2; }
+.contacts form.new button {
+    padding: 0 1em;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+    border: 0;
+    border-radius: 4px;
+    font: inherit;
+    flex-shrink: 0;
+}
+.contacts form.new button:hover:not(:disabled) { background: #1d4ed8; }
+.contacts form.new button:disabled { background: #9ca3af; cursor: not-allowed; }
+
+.contacts .row {
+    display: grid;
+    grid-template-columns: 2fr 3fr 1.5fr auto;
+    gap: 0.8em;
+    padding: 0.5em 0.7em;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+}
+.contacts .row.header {
+    font-weight: 600;
+    color: #888;
+    font-size: 0.78em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #ddd;
+}
+.contacts .row.editing { background: #f8fafc; padding: 0.4em 0.7em; }
+.contacts .row.empty { color: #888; padding: 1.2em; text-align: center; grid-template-columns: 1fr; }
+
+.contacts .row .cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.contacts .row input {
+    padding: 0.3em 0.5em;
+    border: 1px solid #d4d4d8;
+    border-radius: 3px;
+    width: 100%;
+    font: inherit;
+    box-sizing: border-box;
+}
+.contacts .row .actions { display: flex; gap: 0.3em; justify-content: flex-end; }
+.contacts .row .actions button {
+    padding: 0.25em 0.6em;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #d4d4d8;
+    border-radius: 3px;
+    font-size: 0.85em;
+    color: #444;
+}
+.contacts .row .actions button:hover:not(:disabled) { background: #f4f4f5; }
+.contacts .row .actions button:disabled { color: #aaa; cursor: not-allowed; }
+.contacts .row .actions button.danger { color: #b83f45; padding: 0.25em 0.5em; line-height: 1; }
+.contacts .row.editing input:invalid { border-color: #fecaca; background: #fef2f2; }

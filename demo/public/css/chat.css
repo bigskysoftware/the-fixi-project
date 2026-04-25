@@ -1,0 +1,29 @@
+h1 { margin-bottom: 0.1em; }
+
+#log {
+    height: 320px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0.8em 1em;
+    background: #fff;
+    margin-bottom: 0.8em;
+}
+
+.msg { margin: 0.3em 0; font-size: 0.95em; }
+.msg small { color: #888; font-size: 0.8em; margin-left: 0.4em; }
+
+form { display: flex; gap: 0.4em; }
+input { padding: 0.45em 0.6em; font: inherit; border: 1px solid #ccc; border-radius: 4px; }
+input[name=name] { width: 8em; }
+input[name=text] { flex: 1; }
+button {
+    background: #2563eb;
+    color: #fff;
+    border: 0;
+    border-radius: 4px;
+    padding: 0.45em 1em;
+    cursor: pointer;
+    font: inherit;
+}
+button:hover { filter: brightness(1.08); }

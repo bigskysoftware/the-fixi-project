@@ -1,0 +1,25 @@
+<div id="items">
+    <% if (!items.length) { %>
+        <p class="empty">nothing to do</p>
+    <% } else { %>
+        <ul class="todo-list">
+            <% for (let it of items) { %>
+                <li id="item-<%= it.id %>" class="todo <%= it.done ? 'done' : '' %>">
+                    <input type="checkbox"
+                           class="pick"
+                           <%= it.done ? 'checked' : '' %>
+                           fx-action="/items/<%= it.id %>/toggle"
+                           fx-method="post"
+                           fx-target="#items"
+                           fx-swap="morph">
+                    <span class="title"><%= it.title %></span>
+                    <button class="destroy"
+                            fx-action="/items/<%= it.id %>"
+                            fx-method="delete"
+                            fx-target="#items"
+                            fx-swap="morph">&times;</button>
+                </li>
+            <% } %>
+        </ul>
+    <% } %>
+</div>

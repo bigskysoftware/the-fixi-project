@@ -1,0 +1,89 @@
+h1 {
+    font-size: 2em;
+    font-weight: 300;
+    color: #b83f45;
+    margin: 0 0 0.1em;
+    text-align: center;
+}
+
+.todoapp {
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    border-radius: 4px;
+}
+
+form.add { display: flex; border-bottom: 1px solid #ededed; }
+form.add input { flex: 1; padding: 0.9em 1em; font: inherit; border: 0; outline: none; }
+form.add input::placeholder { color: #ccc; font-style: italic; }
+
+.main { border-bottom: 1px solid #ededed; }
+
+.toggle-all-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.55em 1em;
+    background: #fafafa;
+    border-bottom: 1px solid #ededed;
+    font-size: 0.85em;
+    color: #777;
+}
+.toggle-all-bar label { cursor: pointer; }
+
+.todo-list { list-style: none; margin: 0; padding: 0; }
+.todo {
+    display: flex;
+    align-items: center;
+    padding: 0.6em 1em;
+    border-bottom: 1px solid #ededed;
+}
+.todo:last-child { border-bottom: 0; }
+.todo .pick { margin-right: 0.8em; }
+.todo .title { flex: 1; }
+.todo.done .title { text-decoration: line-through; color: #a9a9a9; }
+.todo .destroy {
+    background: transparent;
+    color: #cc9a9a;
+    border: 0;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 0 0.3em;
+}
+.todo .destroy:hover { color: #af5b5e; }
+
+.empty { padding: 1em; text-align: center; color: #888; font-style: italic; }
+
+footer.footer {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: 0.7em 1em;
+    font-size: 0.85em;
+    color: #777;
+}
+footer.footer .count { font-weight: 500; }
+footer.footer .filters { flex: 1; text-align: center; }
+footer.footer .filters button {
+    background: transparent;
+    border: 1px solid transparent;
+    color: inherit;
+    padding: 0.2em 0.5em;
+    font: inherit;
+    font-size: inherit;
+    cursor: pointer;
+    border-radius: 3px;
+}
+footer.footer .filters button.active { border-color: rgba(175,47,47,0.3); }
+footer.footer .clear {
+    background: transparent;
+    color: #777;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    font-size: inherit;
+}
+footer.footer .clear:hover { text-decoration: underline; }
+
+/* filter states: hide rows that don't match the active filter */
+.main[data-filter="active"] .todo.done { display: none; }
+.main[data-filter="completed"] .todo:not(.done) { display: none; }

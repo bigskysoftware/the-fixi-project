@@ -1,0 +1,8 @@
+<div id="contacts-list">
+    <% for(c of contacts) { %>
+      <%~ include('contact-row', { c }) %>
+    <% } %>
+    <% if (contacts.length === 0) { %>
+      <div class="row empty">No matches.</div>
+    <% } %>
+</div>

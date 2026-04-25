@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title><%= title %> - fixi demo</title>
+<script src="/dist/the-fixi-project.js"></script>
+<link rel="stylesheet" href="/css/layout.css">
+<% if (typeof page !== 'undefined' && page) { %><link rel="stylesheet" href="/css/<%= page %>.css"><% } %>
+</head>
+<body>
+<header class="nav"><a href="/">&larr; demo index</a></header>
+<%~ body %>
+</body>
+</html>

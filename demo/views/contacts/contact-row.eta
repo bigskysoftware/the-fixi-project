@@ -1,0 +1,13 @@
+<div class="row" id="c-<%= c.id %>">
+    <div class="cell"><%= c.name %></div>
+    <div class="cell"><%= c.email %></div>
+    <div class="cell"><%= c.phone %></div>
+    <div class="actions">
+        <button fx-action="/contacts/<%= c.id %>/edit" fx-target="#c-<%= c.id %>">edit</button>
+        <button class="danger"
+                fx-action="/contacts/<%= c.id %>"
+                fx-method="DELETE"
+                fx-target="#c-<%= c.id %>"
+                on-fx:config="cfg.confirm = () => confirm('Delete this contact?')">&times;</button>
+    </div>
+</div>
