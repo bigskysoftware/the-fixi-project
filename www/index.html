@@ -299,11 +299,11 @@
     </label>
     <label class="install-row">
         <input type="checkbox" class="pick" checked
-               data-url="https://cdn.jsdelivr.net/npm/fixi-js@0.9.3/fixi.js"
-               data-sri="sha256-Qalmv6iqaAnrglOx2AWSoLfJFmXLGtjAIdBgsLc3bgg="
+               data-url="https://cdn.jsdelivr.net/npm/fixi-js@0.9.4/fixi.js"
+               data-sri="sha256-rPuE58bCyMrZ37o4bByX4epgBA1bAeTylp7TxOXVh90="
                data-pkg="fixi-js"
-               data-ver="0.9.3">
-        <code>&lt;script src="...<b>@0.9.3/fixi.js</b>"&gt;&lt;/script&gt;</code>
+               data-ver="0.9.4">
+        <code>&lt;script src="...<b>@0.9.4/fixi.js</b>"&gt;&lt;/script&gt;</code>
         <a class="copy" href="#" on-click.halt="
             let p=this.closest('.install-row').querySelector('.pick');
             await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
@@ -354,24 +354,25 @@
 <p>NOTE: you will want to load <code>moxi</code> <em>before</em> <code>fixi</code> so its <code>on-fx:init</code> and
     <code>on-fx:process</code> handlers are registered before fixi dispatches those events on page load.</p>
 
-<h2 id="all-in-one"><a href="#all-in-one"><span class="ico">&#x1F9F0;</span> The Fixi Project All-in-One <small>(4.3kb brotli)</small></a></h2>
+<h2 id="all-in-one"><a href="#all-in-one"><span class="ico">&#x1F9F0;</span> The Fixi Project All-in-One <small>(4.4kb brotli)</small></a></h2>
 
 <p>All five libraries are also available pre-concatenated, minified, and brotli-compressed in a single file:</p>
 <div class="installer">
     <div class="installer-header">
         <div class="installer-actions" style="margin-left:auto">
-            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project/dist/the-fixi-project.min.js"
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.1/dist/the-fixi-project.min.js"
+                    data-sri="sha256-PZXMfiKtYIeODhG48+vO/HYe6kPgp8p74t9n7A6z/J0="
                     on-click="
-                        let s=`&lt;script src=&quot;${this.dataset.url}&quot;&gt;&lt;/script&gt;`;
+                        let s=`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`;
                         await navigator.clipboard.writeText(s);
                         let t=this.innerText;
                         this.innerText='copied!';
                         await wait(1200);
                         this.innerText=t
                     ">CDN</button>
-            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project/dist/the-fixi-project.min.js"
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.1/dist/the-fixi-project.min.js"
                     on-click="
-                        let s=`curl -O ${this.dataset.url}`;
+                        let s=`curl -o the-fixi-project@0.0.1.min.js ${this.dataset.url}`;
                         await navigator.clipboard.writeText(s);
                         let t=this.innerText;
                         this.innerText='copied!';
@@ -381,7 +382,13 @@
         </div>
     </div>
     <div class="install-row">
-        <code>&lt;script src="https://cdn.jsdelivr.net/npm/the-fixi-project/dist/the-fixi-project.min.js"&gt;&lt;/script&gt;</code>
+        <code>&lt;script src="...<b>@0.0.1/dist/the-fixi-project.min.js</b>"&gt;&lt;/script&gt;</code>
+        <a class="copy" href="#" data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.1/dist/the-fixi-project.min.js"
+                                 data-sri="sha256-PZXMfiKtYIeODhG48+vO/HYe6kPgp8p74t9n7A6z/J0="
+                                 on-click.prevent.stop="
+            await navigator.clipboard.writeText(`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
+        ">copy</a>
     </div>
 </div>
 

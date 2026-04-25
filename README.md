@@ -126,7 +126,7 @@ All five libraries are also published as a single pre-concatenated, minified, an
 <script src="https://cdn.jsdelivr.net/npm/the-fixi-project/dist/the-fixi-project.min.js"></script>
 ```
 
-The entire fixi project comes in at ~4.2kb when brotli-compressed.
+The entire fixi project comes in at ~4.4kb when brotli-compressed.
 
 ## Developing
 
