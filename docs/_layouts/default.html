@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ page.title | default: "The Fixi Project" }}</title>
+    <link rel="stylesheet" href="site.css">
+    <script src="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.0.2/moxi.js"
+            integrity="sha256-M38vFJVAnZCtEkqBtfjYijQj2NBLVjrZxA0qvAf8YgU="
+            crossorigin="anonymous"></script>
+    <script>
+        addEventListener('DOMContentLoaded', () => {
+            for (let h of document.querySelectorAll('h2[id], h3[id], h4[id]')) {
+                h.innerHTML = `<a href="#${h.id}">${h.innerHTML}</a>`
+            }
+        })
+    </script>
+</head>
+<body>
+{{ content }}
+</body>
+</html>

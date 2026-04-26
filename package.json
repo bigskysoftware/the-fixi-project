@@ -29,7 +29,7 @@
     "clone": "for name in fixi moxi ssexi paxi rexi; do [ -d \"$name\" ] || git clone \"https://github.com/bigskysoftware/$name.git\" \"$name\"; done",
     "test": "node _scripts/test.mjs",
     "status": "node _scripts/status.mjs",
-    "serve": "(sleep 0.3 && open http://localhost:8000) & python3 -m http.server 8000 --directory www",
+    "serve": "cd docs && bundle install --quiet && bundle exec jekyll serve --open-url",
     "demo": "npm run build --silent && node demo/server.mjs",
     "build": "for f in moxi/moxi.js fixi/fixi.js ssexi/ssexi.js paxi/paxi.js rexi/rexi.js; do echo \"// $f\"; cat \"$f\"; echo \";\"; done > dist/the-fixi-project.js && terser moxi/moxi.js fixi/fixi.js ssexi/ssexi.js paxi/paxi.js rexi/rexi.js --compress --mangle --source-map 'includeSources=true,url=\"the-fixi-project.min.js.map\"' -o dist/the-fixi-project.min.js && node -e \"const fs=require('fs'),zlib=require('zlib');fs.writeFileSync('dist/the-fixi-project.min.js.br',zlib.brotliCompressSync(fs.readFileSync('dist/the-fixi-project.min.js')))\"",
     "prepublishOnly": "npm run build"

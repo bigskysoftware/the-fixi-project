@@ -1,0 +1,5 @@
+/tmp
+.idea
+/node_modules
+/docs/_site/
+/docs/.jekyll-cache/

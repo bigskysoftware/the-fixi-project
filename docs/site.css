@@ -1,0 +1,173 @@
+body {
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, sans-serif;
+    max-width: 640px;
+    margin: 3em auto;
+    padding: 0 1em;
+    color: #1a1a1a;
+}
+
+h1 {
+    text-align: center;
+    line-height: 1.3em;
+    font-size: 3em;
+    font-weight: 700;
+    margin-bottom: 0.3em;
+}
+
+.ico {
+    font-size: 1.4em;
+    vertical-align: -0.08em;
+    margin-right: 0.05em;
+}
+
+code {
+    background: #f4f4f5;
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    font-size: 0.95em;
+}
+
+ul {
+    padding-left: 1.2em;
+}
+
+li {
+    margin: 0.5em 0;
+}
+
+a {
+    color: #2563eb;
+}
+
+h2 {
+    font-size: 1.6em;
+    margin-top: 1.5em;
+    margin-bottom: 0.4em;
+}
+
+h3 {
+    font-size: 1.25em;
+    margin-top: 1.2em;
+    margin-bottom: 0.3em;
+}
+
+h4 {
+    font-size: 1.05em;
+    margin-top: 1em;
+    margin-bottom: 0.2em;
+}
+
+h2 a, h3 a, h4 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h2 a:hover, h3 a:hover, h4 a:hover {
+    text-decoration: underline;
+}
+
+pre {
+    background: #f4f4f5;
+    padding: 0.8em 1em;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+    font-size: inherit;
+}
+
+small {
+    color: #666;
+}
+
+.highlight .nt { color: #22863a; }
+.highlight .na { color: #6f42c1; }
+.highlight .s, .highlight .s1, .highlight .s2, .highlight .dl { color: #032f62; }
+.highlight .c, .highlight .c1, .highlight .cm { color: #6a737d; font-style: italic; }
+.highlight .k, .highlight .kd, .highlight .kc { color: #d73a49; }
+.highlight .nf, .highlight .nx { color: #6f42c1; }
+.highlight .mi, .highlight .mf { color: #005cc5; }
+
+.installer {
+    background: #f4f4f5;
+    padding: 0.8em 1em;
+    border-radius: 4px;
+    font-size: 0.9em;
+    line-height: 1.5;
+    overflow-x: auto;
+}
+
+.installer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5em;
+    padding-bottom: 0.4em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid #d4d4d6;
+}
+
+.installer-header label {
+    cursor: pointer;
+    user-select: none;
+}
+
+.installer-actions {
+    display: flex;
+    gap: 0.4em;
+}
+
+.installer button {
+    background: linear-gradient(#ffffff, #e8e8ea);
+    color: #1a1a1a;
+    border: 1px solid #b8b8bc;
+    border-radius: 4px;
+    padding: 0.25em 0.8em;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9em;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 1px 2px rgba(0,0,0,0.12);
+}
+
+.installer button:hover { background: linear-gradient(#ffffff, #f0f0f2); }
+
+.installer button:active {
+    background: linear-gradient(#e0e0e2, #ededef);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.18) inset;
+}
+
+.install-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6em;
+    font-family: ui-monospace, monospace;
+    cursor: pointer;
+    padding: 0.2em 0;
+    transition: opacity 0.15s;
+}
+
+.install-row:has(.pick:not(:checked)) { opacity: 0.35; }
+
+.install-row code {
+    background: transparent;
+    padding: 0;
+    font-size: 0.95em;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.install-row .copy {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 0.82em;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    flex-shrink: 0;
+}
+.install-row .copy:hover { text-decoration: underline; }
