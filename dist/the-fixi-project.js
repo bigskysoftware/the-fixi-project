@@ -37,7 +37,7 @@
 			if (v && typeof v == "object") return proxy(elts.map(e=>e[p]))
 			return v
 		},
-		set:(_,p,v)=>(elts.forEach(e=>e[p]=v),true)
+		set:(_,p,v)=>(elts.forEach(e=>e[p]=v),recompute(),true)
 	}),
 	mkq = ctx=>sel=>{
 		if (typeof sel != "string") return proxy(sel.nodeType ? [sel] : [...sel])
