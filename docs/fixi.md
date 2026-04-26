@@ -12,6 +12,23 @@ in response to any event, and place the response HTML anywhere in the document.
 
 Like htmx, fixi uses attributes to add behaviors to HTML elements.
 
+### A Simple Demo
+
+Here is a fixi-powered button that loads a fragment into a panel:
+
+```html
+<button fx-action="/profile" 
+        fx-target="#panel" 
+        fx-swap="innerHTML">
+    Load profile
+</button>
+<output id="panel"></output>
+```
+
+Clicking this button issues a `GET /profile` request & whatever HTML comes back is placed inside `#panel`.
+
+This demonstrates the core idea of fixi: an element issues a request, gets some HTML back & places it somewhere in the DOM.
+
 ## Attributes
 
 The five core fixi attributes are:
@@ -109,25 +126,6 @@ Per-element listeners always win over these defaults.
 ## Examples
 
 Below are some fixi-only examples to show what you can do with it.
-
-### A Simple Button
-
-Here is a fixi-powered button that loads a fragment into a panel:
-
-```html
-<button fx-action="/profile" 
-        fx-target="#panel" 
-        fx-swap="innerHTML">
-    Load profile
-</button>
-<output id="panel"></output>
-```
-
-Clicking this button issues a `GET /profile` request & whatever HTML comes back is placed inside `#panel`. 
-
-This demonstrates the core idea of fixi: an element issues a request, gets some HTML back & places it somewhere in the DOM.
-
-Note that `fx-trigger` was not used because the default for a button is the natural event: `click`.
 
 ### Inline Editing
 

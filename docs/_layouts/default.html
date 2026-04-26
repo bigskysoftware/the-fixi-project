@@ -25,14 +25,14 @@
 <details class="mobilenav">
     <summary>Menu</summary>
     <nav>
-        {% for item in site.data.nav %}<a href="{{ item.url | relative_url }}"{% if u == item.url %} class="active"{% endif %}>{% if item.ico %}<span class="ico">{{ item.ico }}</span> {% endif %}{{ item.label }}</a>{% endfor %}
+        {% for item in site.data.nav %}<a href="{{ item.url | relative_url }}"{% if u == item.url %} class="active"{% endif %}>{% if item.ico %}<span class="ico">{{ item.ico }}</span>{% endif %}<span class="lbl">{{ item.label }}</span>{% if item.desc %}<span class="desc">{{ item.desc }}</span>{% endif %}</a>{% endfor %}
     </nav>
 </details>
 
 <main>
     <h1>{{ page.heading | default: page.title | default: "The Fixi Project" }}</h1>
     <nav class="topnav">
-        {% for item in site.data.nav %}<a href="{{ item.url | relative_url }}"{% if u == item.url %} class="active"{% endif %}>{% if item.ico %}<span class="ico">{{ item.ico }}</span>{% endif %}{{ item.label }}</a>{% endfor %}
+        {% for item in site.data.nav %}<a href="{{ item.url | relative_url }}"{% if u == item.url %} class="active"{% endif %}>{% if item.ico %}<span class="ico">{{ item.ico }}</span>{% endif %}<span class="lbl">{{ item.label }}</span></a>{% endfor %}
     </nav>
 {{ content }}
     <nav class="pagination">

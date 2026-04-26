@@ -1,24 +1,32 @@
 - url: /
   label: Home
   ico: "&#x1F3E0;"
+  desc: Project overview & installation
 - url: /docs.html
   label: Guide
   ico: "&#x1F4D6;"
+  desc: A tour through the libraries
 - url: /fixi.html
   label: fixi
   ico: "&#x1F6B2;"
+  desc: Supercharged HTML
 - url: /moxi.html
   label: moxi
   ico: "&#x1F94A;"
+  desc: Inline scripting & reactivity
 - url: /paxi.html
   label: paxi
   ico: "&#x267B;&#xFE0F;"
+  desc: DOM morphing / patching
 - url: /ssexi.html
   label: ssexi
   ico: "&#x1F4E1;"
+  desc: Streaming HTML & events
 - url: /rexi.html
   label: rexi
   ico: "&#x1F415;"
+  desc: Ergonomic fetch wrappers
 - url: /demo.html
   label: Demo
   ico: "&#x1F4FC;"
+  desc: How to see working examples

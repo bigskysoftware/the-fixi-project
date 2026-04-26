@@ -16,11 +16,11 @@ main {
     background: #fff;
     border-top: 1px solid #e0e0e0;
     border-bottom: 1px solid #e0e0e0;
-    padding: 0.6em 0;
+    padding: 0.7em 0;
     margin: 1em 0 2em;
     display: flex;
     flex-wrap: nowrap;
-    gap: 0.6em;
+    gap: 1.1em;
     justify-content: center;
     align-items: center;
 }
@@ -32,9 +32,10 @@ main {
     color: #2563eb;
     text-decoration: none;
     white-space: nowrap;
+    font-size: 1.1em;
 }
 
-.topnav a:hover { text-decoration: underline; }
+.topnav a:hover .lbl { text-decoration: underline; }
 
 .topnav a.active {
     color: #1a1a1a;
@@ -85,21 +86,29 @@ main {
         color: #2563eb;
         text-decoration: none;
         display: flex;
-        justify-content: center;
         align-items: center;
+        gap: 0.6em;
         padding: 0.5em 0;
         border-bottom: 1px solid #e0e0e0;
     }
     .mobilenav nav a:last-child { border-bottom: none; }
-    .mobilenav nav a:hover { text-decoration: underline; }
-    .mobilenav nav a.active {
+    .mobilenav nav a:hover .lbl { text-decoration: underline; }
+    .mobilenav nav a.active .lbl {
         color: #1a1a1a;
         font-weight: 600;
     }
     .mobilenav nav a .ico {
         font-size: 2em;
-        margin-right: 0.05em;
-        vertical-align: -0.2em;
+        flex-shrink: 0;
+    }
+    .mobilenav nav a .lbl {
+        font-weight: 600;
+        min-width: 4.5em;
+    }
+    .mobilenav nav a .desc {
+        color: #666;
+        font-size: 0.9em;
+        flex: 1;
     }
 }
 
