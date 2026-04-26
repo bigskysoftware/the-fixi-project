@@ -17,7 +17,7 @@ Each library has its own repository with a full README, a runnable test suite,
 and a small source file, most of which you can read and understand completely in a
 few minutes (moxi.js is a little dense and may take a bit longer).
 
-The entire fixi project is ~4.5kb in size.
+The entire fixi project is ~4.4kb minified and brotli-compressed.
 
 ## Installing
 
@@ -363,6 +363,26 @@ The server returns either the display row or the edit form depending on the URL.
 with `fx-swap="morph"` (paxi) so any focused input or scroll position outside the row
 isn't disturbed.
 
+### Disable Submit Until Valid
+
+A submit button on a fixi-powered form that stays disabled until every required field
+passes HTML validation:
+
+```html
+<form fx-action="/signup" fx-method="POST">
+    <input name="email" type="email" required placeholder="email">
+    <input name="username" type="text" required minlength="3" placeholder="username">
+    <button type="submit" live="this.disabled = !q('closest form').checkValidity()">
+        sign up
+    </button>
+</form>
+```
+
+moxi's `live` re-runs whenever any `input` or `change` fires on the page, so the button
+updates in real time without any manual event wiring. 
+
+`q('closest form')` walks up from the button to its containing form, so the same handler works in any form.
+
 ### Confirm Before Delete
 
 moxi listens for fixi's `fx:config` event and sets `cfg.confirm`:
@@ -400,6 +420,26 @@ moxi's `take(cls, from, to)` helper moves a class from one element to another in
     <button class="tab"        on-click="take('active', '.tab', this)">Three</button>
 </nav>
 ```
+
+### Polling
+
+An element that refreshes itself every few seconds. moxi's `on-init` runs once when the
+element is wired up, and because handlers are async, an infinite loop with
+`await wait(...)` gives you a polling timer in two lines:
+
+```html
+<div id="status"
+     fx-action="/status"
+     fx-trigger="poll"
+     fx-swap="innerHTML"
+     on-init="while (this.isConnected) { trigger('poll'); await wait(2000); }">
+    loading...
+</div>
+```
+
+`trigger('poll')` dispatches the `poll` event on the div, which fixi's `fx-trigger="poll"` picks up to issue the request. 
+
+Gating the loop on `this.isConnected` lets it bail cleanly when the element is replaced or removed, so the timer doesn't leak past the element's lifetime.
 
 ### Server-Pushed List Updates
 
