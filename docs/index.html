@@ -286,11 +286,11 @@
     </div>
     <label class="install-row">
         <input type="checkbox" class="pick" checked
-               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.0.1/moxi.js"
-               data-sri="sha256-RgoYY/abzRDXHNFdoLaSRfqpJX9JtuXmM1GECDQDjig="
+               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.0.2/moxi.js"
+               data-sri="sha256-M38vFJVAnZCtEkqBtfjYijQj2NBLVjrZxA0qvAf8YgU="
                data-pkg="@bigskysoftware/moxi-js"
-               data-ver="0.0.1">
-        <code>&lt;script src="...<b>@0.0.1/moxi.js</b>"&gt;&lt;/script&gt;</code>
+               data-ver="0.0.2">
+        <code>&lt;script src="...<b>@0.0.2/moxi.js</b>"&gt;&lt;/script&gt;</code>
         <a class="copy" href="#" on-click.halt="
             let p=this.closest('.install-row').querySelector('.pick');
             await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
@@ -360,8 +360,8 @@
 <div class="installer">
     <div class="installer-header">
         <div class="installer-actions" style="margin-left:auto">
-            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.1/dist/the-fixi-project.min.js"
-                    data-sri="sha256-PZXMfiKtYIeODhG48+vO/HYe6kPgp8p74t9n7A6z/J0="
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.2/dist/the-fixi-project.min.js"
+                    data-sri="sha256-h135pgDF5LnpmVT902+CQ4+StmK9ktdcWS5/Vv2cs+o="
                     on-click="
                         let s=`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`;
                         await navigator.clipboard.writeText(s);
@@ -370,9 +370,9 @@
                         await wait(1200);
                         this.innerText=t
                     ">CDN</button>
-            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.1/dist/the-fixi-project.min.js"
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.2/dist/the-fixi-project.min.js"
                     on-click="
-                        let s=`curl -o the-fixi-project@0.0.1.min.js ${this.dataset.url}`;
+                        let s=`curl -o the-fixi-project@0.0.2.min.js ${this.dataset.url}`;
                         await navigator.clipboard.writeText(s);
                         let t=this.innerText;
                         this.innerText='copied!';
@@ -382,9 +382,9 @@
         </div>
     </div>
     <div class="install-row">
-        <code>&lt;script src="...<b>@0.0.1/dist/the-fixi-project.min.js</b>"&gt;&lt;/script&gt;</code>
-        <a class="copy" href="#" data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.1/dist/the-fixi-project.min.js"
-                                 data-sri="sha256-PZXMfiKtYIeODhG48+vO/HYe6kPgp8p74t9n7A6z/J0="
+        <code>&lt;script src="...<b>@0.0.2/dist/the-fixi-project.min.js</b>"&gt;&lt;/script&gt;</code>
+        <a class="copy" href="#" data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.2/dist/the-fixi-project.min.js"
+                                 data-sri="sha256-h135pgDF5LnpmVT902+CQ4+StmK9ktdcWS5/Vv2cs+o="
                                  on-click.prevent.stop="
             await navigator.clipboard.writeText(`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
             let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
