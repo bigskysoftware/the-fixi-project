@@ -94,15 +94,33 @@ There are two types of moxi attributes:
   `on-click="this.count++"`)
 - `live`: a reactive program that is re-evaluated whenever the DOM or form state changes
 
-To make inline scripting more efficient, moxi includes some helpers in scripts:
+To make inline scripting easier, moxi exposes a few global helpers:
 
-- `q(x)`: a sophisticated query mechanism that allows you to look elements up and apply bulk operations to them easily
-- `trigger(name, detail, bubbles?)`: dispatches an event on the current element
-- `wait(x)`: allows you to wait `x` milliseconds, or for when an event named `x` fires on the current element
-- `debounce(ms)`: allows you to [debounce](https://developer.mozilla.org/en-US/docs/Glossary/Debounce) event handling
-- `transition(fn)`: allows you to wrap some code in
-  a [view transition](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API)
-- `take(cls, from, to)`: allows you to take a given CSS class from a set of elements for another element
+- `q(x)`: a sophisticated query mechanism for looking elements up and applying bulk operations to them. `x` can be a CSS selector, an `Element`, or any iterable of elements.  It also supports relative selectors like `next div` and `li in this`.
+- `wait(x)`: returns a Promise that resolves after `x` milliseconds (when `x` is a number) or when an event named `x` fires (when `x` is a string).
+- `transition(fn)`: wraps `fn` in a [view transition](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) if available.
+
+The `q()` function returns a proxy object that has useful features for working with sets of elements:
+
+- `q(...).trigger(name, detail, bubbles?)`: dispatch a `CustomEvent` from every match
+- `q(...).take(cls, from)`: take CSS class `cls` from elements matching `from`
+- `q(...).insert(pos, html)`: parse and insert HTML at every match
+- `q(...).count`: the count of matches
+- `q(...).arr()`: converts the proxy to an array
+
+In addition, you can iterate naturally over results from `q()` and, like jQuery, properties and methods can be invoked on all elements in the collection.
+
+Inside `on-` handler bodies one extra helper is available:
+
+- `debounce(ms)`: debounces the current handler, if it is invoked again within `ms` milliseconds it will not execute
+
+Inside `on-*` and `live` handlers a `trigger(name, detail, bubbles?)` helper is also in
+scope, dispatching a `CustomEvent` from `this`. (To dispatch from a different element use
+`q(elt).trigger(...)`.)
+
+Note that `q()` directionals (`next`, `prev`, `closest`, `in this`) and `wait("event")`
+are context-aware: in a handler they resolve relative to `this`; called globally they
+resolve relative to `document.documentElement`.
 
 #### Example
 
@@ -383,6 +401,26 @@ updates in real time without any manual event wiring.
 
 `q('closest form')` walks up from the button to its containing form, so the same handler works in any form.
 
+### Master Checkbox
+
+A master checkbox that mirrors a group of subordinate checkboxes: checked when every
+match is checked, indeterminate when some are, unchecked when none are. Clicking the
+master propagates its state to every subordinate.
+
+```html
+<input type="checkbox" id="select-all" checked
+       live="let b=q('.pick').arr();
+             let n=b.filter(x=>x.checked).length;
+             this.checked=n===b.length;
+             this.indeterminate=n>0&&n<b.length"
+       on-click="for (let x of q('.pick')) x.checked=this.checked">
+```
+
+The `live` expression re-runs on every `input`/`change` anywhere on the page, so toggling
+any single `.pick` keeps the master in sync. The `on-click` handler walks the
+subordinates and sets each one's `.checked` to the master's, giving "select all" /
+"deselect all" behavior in one line.
+
 ### Confirm Before Delete
 
 moxi listens for fixi's `fx:config` event and sets `cfg.confirm`:
@@ -415,9 +453,9 @@ moxi's `take(cls, from, to)` helper moves a class from one element to another in
 
 ```html
 <nav>
-    <button class="tab active" on-click="take('active', '.tab', this)">One</button>
-    <button class="tab"        on-click="take('active', '.tab', this)">Two</button>
-    <button class="tab"        on-click="take('active', '.tab', this)">Three</button>
+    <button class="tab active" on-click="q(this).take('active', '.tab')">One</button>
+    <button class="tab"        on-click="q(this).take('active', '.tab')">Two</button>
+    <button class="tab"        on-click="q(this).take('active', '.tab')">Three</button>
 </nav>
 ```
 
@@ -437,7 +475,7 @@ element is wired up, and because handlers are async, an infinite loop with
 </div>
 ```
 
-`trigger('poll')` dispatches the `poll` event on the div, which fixi's `fx-trigger="poll"` picks up to issue the request. 
+`trigger('poll')` dispatches the `poll` event on the div (in a handler `trigger` resolves to `this`), which fixi's `fx-trigger="poll"` picks up to issue the request.
 
 Gating the loop on `this.isConnected` lets it bail cleanly when the element is replaced or removed, so the timer doesn't leak past the element's lifetime.
 

@@ -47,54 +47,44 @@ Pick whichever you need and drop it into a page:
     <div class="installer-header">
         <label>
             <input type="checkbox" id="install-all" checked
-                   live="
-                       let b=q('.pick').arr();
-                       let n=b.filter(x=>x.checked).length;
-                       this.checked=n===b.length;
-                       this.indeterminate=n>0&&n<b.length
-                   "
+                   live="let b=q('.pick').arr();
+                         let n=b.filter(x=>x.checked).length;
+                         this.checked=n===b.length;
+                         this.indeterminate=n>0&&n<b.length"
                    on-click="for (let x of q('.pick')) x.checked=this.checked">
             select all
         </label>
         <div class="installer-actions">
-            <button on-click="
-                let parts=q('.pick').arr().filter(x=>x.checked).map(x=>{
-                    let n=x.dataset.url.split('/').pop().replace(/\.js$/, '');
-                    return `echo &quot;// ${n} @ ${x.dataset.ver}&quot;; curl -s ${x.dataset.url}; echo`
-                }).join('; ');
-                await navigator.clipboard.writeText(`{ ${parts}; } > fixi-distro.js`);
-                let t=this.innerText;
-                this.innerText='copied!';
-                await wait(1200);
-                this.innerText=t
-            ">cat</button>
-            <button on-click="
-                let s=q('.pick').arr().filter(x=>x.checked).map(x=>{
-                    let f=x.dataset.url.split('/').pop().replace(/\.js$/, `@${x.dataset.ver}.js`);
-                    return `curl -o ${f} ${x.dataset.url}`
-                }).join('\n');
-                await navigator.clipboard.writeText(s);
-                let t=this.innerText;
-                this.innerText='copied!';
-                await wait(1200);
-                this.innerText=t
-            ">vendor</button>
-            <button on-click="
-                let p=q('.pick').arr().filter(x=>x.checked).map(x=>`${x.dataset.pkg}@${x.dataset.ver}`).join(' ');
-                await navigator.clipboard.writeText(`npm install ${p}`);
-                let t=this.innerText;
-                this.innerText='copied!';
-                await wait(1200);
-                this.innerText=t
-            ">npm</button>
-            <button on-click="
-                let s=q('.pick').arr().filter(x=>x.checked).map(x=>`&lt;script src=&quot;${x.dataset.url}&quot; integrity=&quot;${x.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`).join('\n');
-                await navigator.clipboard.writeText(s);
-                let t=this.innerText;
-                this.innerText='copied!';
-                await wait(1200);
-                this.innerText=t
-            ">CDN</button>
+            <button on-click="let parts=q('.pick').arr().filter(x=>x.checked).map(x=>{
+                                  let n=x.dataset.url.split('/').pop().replace(/\.js$/, '');
+                                  return `echo &quot;// ${n} @ ${x.dataset.ver}&quot;; curl -s ${x.dataset.url}; echo`
+                              }).join('; ');
+                              await navigator.clipboard.writeText(`{ ${parts}; } > fixi-distro.js`);
+                              let t=this.innerText;
+                              this.innerText='copied!';
+                              await wait(1200);
+                              this.innerText=t">cat</button>
+            <button on-click="let s=q('.pick').arr().filter(x=>x.checked).map(x=>{
+                                  let f=x.dataset.url.split('/').pop().replace(/\.js$/, `@${x.dataset.ver}.js`);
+                                  return `curl -o ${f} ${x.dataset.url}`
+                              }).join('\n');
+                              await navigator.clipboard.writeText(s);
+                              let t=this.innerText;
+                              this.innerText='copied!';
+                              await wait(1200);
+                              this.innerText=t">vendor</button>
+            <button on-click="let p=q('.pick').arr().filter(x=>x.checked).map(x=>`${x.dataset.pkg}@${x.dataset.ver}`).join(' ');
+                              await navigator.clipboard.writeText(`npm install ${p}`);
+                              let t=this.innerText;
+                              this.innerText='copied!';
+                              await wait(1200);
+                              this.innerText=t">npm</button>
+            <button on-click="let s=q('.pick').arr().filter(x=>x.checked).map(x=>`&lt;script src=&quot;${x.dataset.url}&quot; integrity=&quot;${x.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`).join('\n');
+                              await navigator.clipboard.writeText(s);
+                              let t=this.innerText;
+                              this.innerText='copied!';
+                              await wait(1200);
+                              this.innerText=t">CDN</button>
         </div>
     </div>
     <label class="install-row">
@@ -104,11 +94,9 @@ Pick whichever you need and drop it into a page:
                data-pkg="@bigskysoftware/moxi-js"
                data-ver="0.0.2">
         <code>&lt;script src="...<b>@0.0.2/moxi.js</b>"&gt;&lt;/script&gt;</code>
-        <a class="copy" href="#" on-click.halt="
-            let p=this.closest('.install-row').querySelector('.pick');
-            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
-            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
-        ">copy</a>
+        <a class="copy" href="#" on-click.halt="let p=this.closest('.install-row').querySelector('.pick');
+                                                await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+                                                let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
     </label>
     <label class="install-row">
         <input type="checkbox" class="pick" checked
@@ -117,11 +105,9 @@ Pick whichever you need and drop it into a page:
                data-pkg="fixi-js"
                data-ver="0.9.4">
         <code>&lt;script src="...<b>@0.9.4/fixi.js</b>"&gt;&lt;/script&gt;</code>
-        <a class="copy" href="#" on-click.halt="
-            let p=this.closest('.install-row').querySelector('.pick');
-            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
-            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
-        ">copy</a>
+        <a class="copy" href="#" on-click.halt="let p=this.closest('.install-row').querySelector('.pick');
+                                                await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+                                                let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
     </label>
     <label class="install-row">
         <input type="checkbox" class="pick" checked
@@ -130,11 +116,9 @@ Pick whichever you need and drop it into a page:
                data-pkg="@bigskysoftware/ssexi-js"
                data-ver="0.0.1">
         <code>&lt;script src="...<b>@0.0.1/ssexi.js</b>"&gt;&lt;/script&gt;</code>
-        <a class="copy" href="#" on-click.halt="
-            let p=this.closest('.install-row').querySelector('.pick');
-            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
-            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
-        ">copy</a>
+        <a class="copy" href="#" on-click.halt="let p=this.closest('.install-row').querySelector('.pick');
+                                                await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+                                                let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
     </label>
     <label class="install-row">
         <input type="checkbox" class="pick" checked
@@ -143,11 +127,9 @@ Pick whichever you need and drop it into a page:
                data-pkg="@bigskysoftware/paxi-js"
                data-ver="0.0.1">
         <code>&lt;script src="...<b>@0.0.1/paxi.js</b>"&gt;&lt;/script&gt;</code>
-        <a class="copy" href="#" on-click.halt="
-            let p=this.closest('.install-row').querySelector('.pick');
-            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
-            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
-        ">copy</a>
+        <a class="copy" href="#" on-click.halt="let p=this.closest('.install-row').querySelector('.pick');
+                                                await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+                                                let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
     </label>
     <label class="install-row">
         <input type="checkbox" class="pick" checked
@@ -156,11 +138,9 @@ Pick whichever you need and drop it into a page:
                data-pkg="@bigskysoftware/rexi-js"
                data-ver="0.0.1">
         <code>&lt;script src="...<b>@0.0.1/rexi.js</b>"&gt;&lt;/script&gt;</code>
-        <a class="copy" href="#" on-click.prevent.stop="
-            let p=this.closest('.install-row').querySelector('.pick');
-            await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
-            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
-        ">copy</a>
+        <a class="copy" href="#" on-click.prevent.stop="let p=this.closest('.install-row').querySelector('.pick');
+                                                        await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+                                                        let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
     </label>
 </div>
 
@@ -176,34 +156,28 @@ a single file:
     <div class="installer-header">
         <div class="installer-actions" style="margin-left:auto">
             <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.2/dist/the-fixi-project.min.js"
-                    on-click="
-                        let s=`curl -o the-fixi-project@0.0.2.min.js ${this.dataset.url}`;
-                        await navigator.clipboard.writeText(s);
-                        let t=this.innerText;
-                        this.innerText='copied!';
-                        await wait(1200);
-                        this.innerText=t
-                    ">vendor</button>
+                    on-click="let s=`curl -o the-fixi-project@0.0.2.min.js ${this.dataset.url}`;
+                              await navigator.clipboard.writeText(s);
+                              let t=this.innerText;
+                              this.innerText='copied!';
+                              await wait(1200);
+                              this.innerText=t">vendor</button>
             <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.2/dist/the-fixi-project.min.js"
                     data-sri="sha256-h135pgDF5LnpmVT902+CQ4+StmK9ktdcWS5/Vv2cs+o="
-                    on-click="
-                        let s=`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`;
-                        await navigator.clipboard.writeText(s);
-                        let t=this.innerText;
-                        this.innerText='copied!';
-                        await wait(1200);
-                        this.innerText=t
-                    ">CDN</button>
+                    on-click="let s=`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`;
+                              await navigator.clipboard.writeText(s);
+                              let t=this.innerText;
+                              this.innerText='copied!';
+                              await wait(1200);
+                              this.innerText=t">CDN</button>
         </div>
     </div>
     <div class="install-row">
         <code>&lt;script src="...<b>@0.0.2/dist/the-fixi-project.min.js</b>"&gt;&lt;/script&gt;</code>
         <a class="copy" href="#" data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.2/dist/the-fixi-project.min.js"
                                  data-sri="sha256-h135pgDF5LnpmVT902+CQ4+StmK9ktdcWS5/Vv2cs+o="
-                                 on-click.prevent.stop="
-            await navigator.clipboard.writeText(`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
-            let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t
-        ">copy</a>
+                                 on-click.prevent.stop="await navigator.clipboard.writeText(`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
+                                                        let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
     </div>
 </div>
 

@@ -30,22 +30,17 @@
     </div>
 
     <footer class="footer"
-            live="
-                let picks = q('.pick').arr();
-                let active = picks.filter(x => !x.checked).length;
-                let done   = picks.length - active;
-                q('.count in this').innerText = active + (active === 1 ? ' item' : ' items') + ' left';
-                q('.clear in this').hidden = done === 0
-            ">
+            live="let picks = q('.pick').arr();
+                  let active = picks.filter(x => !x.checked).length;
+                  let done   = picks.length - active;
+                  q('.count in this').innerText = active + (active === 1 ? ' item' : ' items') + ' left';
+                  q('.clear in this').hidden = done === 0">
         <span class="count"></span>
         <div class="filters"
-             on-click="
-                let f = event.target.dataset.filter;
-                if (!f) return;
-                q('.main').dataset.filter = f === 'all' ? '' : f;
-                q('.filters button in this').classList.remove('active');
-                event.target.classList.add('active')
-             ">
+             on-click="let f = event.target.dataset.filter;
+                       if (!f) return;
+                       q('.main').dataset.filter = f === 'all' ? '' : f;
+                       q(event.target).take('active', q('button in this'))">
             <button data-filter="all" class="active">all</button>
             <button data-filter="active">active</button>
             <button data-filter="completed">completed</button>
