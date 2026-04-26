@@ -1,6 +1,6 @@
 {
   "name": "the-fixi-project",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "The Fixi Project - the all-in-one bundle of fixi, moxi, ssexi, paxi, and rexi",
   "main": "dist/the-fixi-project.js",
   "files": [

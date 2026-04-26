@@ -17,7 +17,7 @@ Each library has its own repository with a full README, a runnable test suite,
 and a small source file, most of which you can read and understand completely in a
 few minutes (moxi.js is a little dense and may take a bit longer).
 
-The entire fixi project is ~4.4kb minified and brotli-compressed.
+The entire fixi project is ~4.5kb minified and brotli-compressed.
 
 ## Installing
 

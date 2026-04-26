@@ -89,11 +89,11 @@ Pick whichever you need and drop it into a page:
     </div>
     <label class="install-row">
         <input type="checkbox" class="pick" checked
-               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.0.2/moxi.js"
-               data-sri="sha256-M38vFJVAnZCtEkqBtfjYijQj2NBLVjrZxA0qvAf8YgU="
+               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.1.0/moxi.js"
+               data-sri="sha256-mrpYW3yY45ec7RlIyDVCDx2/NnrZOQNB4v+OavwQo7Q="
                data-pkg="@bigskysoftware/moxi-js"
-               data-ver="0.0.2">
-        <code>&lt;script src="...<b>@0.0.2/moxi.js</b>"&gt;&lt;/script&gt;</code>
+               data-ver="0.1.0">
+        <code>&lt;script src="...<b>@0.1.0/moxi.js</b>"&gt;&lt;/script&gt;</code>
         <a class="copy" href="#" on-click.halt="let p=this.closest('.install-row').querySelector('.pick');
                                                 await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
                                                 let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
@@ -147,7 +147,7 @@ Pick whichever you need and drop it into a page:
 NOTE: you will want to load `moxi` _before_ `fixi` so its `on-fx:init` and
 `on-fx:process` handlers are registered before fixi dispatches those events on page load.
 
-## <span class="ico">&#x1F9F0;</span> The Fixi Project All-in-One <small>(4.4kb brotli)</small> {#all-in-one}
+## <span class="ico">&#x1F9F0;</span> The Fixi Project All-in-One <small>(4.5kb brotli)</small> {#all-in-one}
 
 All five libraries are also available pre-concatenated, minified, and brotli-compressed in
 a single file:
@@ -155,15 +155,15 @@ a single file:
 <div class="installer">
     <div class="installer-header">
         <div class="installer-actions" style="margin-left:auto">
-            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.2/dist/the-fixi-project.min.js"
-                    on-click="let s=`curl -o the-fixi-project@0.0.2.min.js ${this.dataset.url}`;
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.1.0/dist/the-fixi-project.min.js"
+                    on-click="let s=`curl -o the-fixi-project@0.1.0.min.js ${this.dataset.url}`;
                               await navigator.clipboard.writeText(s);
                               let t=this.innerText;
                               this.innerText='copied!';
                               await wait(1200);
                               this.innerText=t">vendor</button>
-            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.2/dist/the-fixi-project.min.js"
-                    data-sri="sha256-h135pgDF5LnpmVT902+CQ4+StmK9ktdcWS5/Vv2cs+o="
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.1.0/dist/the-fixi-project.min.js"
+                    data-sri="sha256-vgNYRU+0F96B+NgVmelclAT78PRqaAJDEHz5JfynmV0="
                     on-click="let s=`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`;
                               await navigator.clipboard.writeText(s);
                               let t=this.innerText;
@@ -173,9 +173,9 @@ a single file:
         </div>
     </div>
     <div class="install-row">
-        <code>&lt;script src="...<b>@0.0.2/dist/the-fixi-project.min.js</b>"&gt;&lt;/script&gt;</code>
-        <a class="copy" href="#" data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.0.2/dist/the-fixi-project.min.js"
-                                 data-sri="sha256-h135pgDF5LnpmVT902+CQ4+StmK9ktdcWS5/Vv2cs+o="
+        <code>&lt;script src="...<b>@0.1.0/dist/the-fixi-project.min.js</b>"&gt;&lt;/script&gt;</code>
+        <a class="copy" href="#" data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.1.0/dist/the-fixi-project.min.js"
+                                 data-sri="sha256-vgNYRU+0F96B+NgVmelclAT78PRqaAJDEHz5JfynmV0="
                                  on-click.prevent.stop="await navigator.clipboard.writeText(`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
                                                         let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
     </div>
