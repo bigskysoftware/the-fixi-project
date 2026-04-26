@@ -1,17 +1,158 @@
 body {
     font: 16px/1.6 -apple-system, BlinkMacSystemFont, sans-serif;
-    max-width: 640px;
-    margin: 3em auto;
-    padding: 0 1em;
+    margin: 0;
+    padding: 0;
     color: #1a1a1a;
+    background: #fff;
+}
+
+main {
+    max-width: 700px;
+    margin: 2em auto;
+    padding: 0 1em;
+}
+
+.topnav {
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0.6em 0;
+    margin: 1em 0 2em;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.6em;
+    justify-content: center;
+    align-items: center;
+}
+
+.topnav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    color: #2563eb;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.topnav a:hover { text-decoration: underline; }
+
+.topnav a.active {
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+.topnav a .ico {
+    font-size: 1.5em;
+    line-height: 1;
+    margin: 0;
+    vertical-align: baseline;
+}
+
+.mobilenav { display: none; }
+
+@media (max-width: 800px) {
+    .topnav { display: none; }
+    .mobilenav {
+        display: block;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #fff;
+        padding: 0.5em 1em;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .mobilenav summary {
+        cursor: pointer;
+        list-style: none;
+        font-weight: 600;
+        padding: 0.2em 0;
+    }
+    .mobilenav summary::-webkit-details-marker { display: none; }
+    .mobilenav summary::after {
+        content: "▾";
+        float: right;
+        color: #666;
+        font-size: 1.6em;
+        line-height: 1;
+    }
+    .mobilenav[open] summary::after { content: "▴"; }
+    .mobilenav nav {
+        display: flex;
+        flex-direction: column;
+        padding: 0.6em 0 0.3em;
+    }
+    .mobilenav nav a {
+        color: #2563eb;
+        text-decoration: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.5em 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    .mobilenav nav a:last-child { border-bottom: none; }
+    .mobilenav nav a:hover { text-decoration: underline; }
+    .mobilenav nav a.active {
+        color: #1a1a1a;
+        font-weight: 600;
+    }
+    .mobilenav nav a .ico {
+        font-size: 2em;
+        margin-right: 0.05em;
+        vertical-align: -0.2em;
+    }
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 1em;
+    margin: 3em 0 1em;
+    padding-top: 1.5em;
+    border-top: 1px solid #e0e0e0;
+}
+
+.pagination a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    background: linear-gradient(#ffffff, #e8e8ea);
+    color: #1a1a1a;
+    border: 1px solid #b8b8bc;
+    padding: 0.55em 1.3em;
+    border-radius: 6px;
+    font-size: 1.1em;
+    font-weight: 500;
+    line-height: 1;
+    text-decoration: none;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.9) inset, 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.pagination a:hover {
+    background: linear-gradient(#ffffff, #f0f0f2);
+    text-decoration: none;
+}
+
+.pagination a:active {
+    background: linear-gradient(#e0e0e2, #ededef);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.18) inset;
+}
+
+.pagination a .ico {
+    font-size: 1.7em;
+    line-height: 1;
+}
+
+.pagination a .arr {
+    font-size: 1.1em;
 }
 
 h1 {
     text-align: center;
     line-height: 1.3em;
-    font-size: 3em;
+    font-size: 2.6em;
     font-weight: 700;
-    margin-bottom: 0.3em;
+    margin: 0.3em 0;
 }
 
 .ico {
@@ -25,6 +166,7 @@ code {
     padding: 0.1em 0.35em;
     border-radius: 3px;
     font-size: 0.95em;
+    white-space: nowrap;
 }
 
 ul {
@@ -79,6 +221,7 @@ pre code {
     background: transparent;
     padding: 0;
     font-size: inherit;
+    white-space: pre;
 }
 
 small {
@@ -171,3 +314,67 @@ small {
     flex-shrink: 0;
 }
 .install-row .copy:hover { text-decoration: underline; }
+
+main table {
+    border-collapse: collapse;
+    margin: 1em 0;
+}
+
+main table th, main table td {
+    padding: 0.4em 0.8em;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+    vertical-align: top;
+}
+
+main table th {
+    border-bottom-width: 2px;
+}
+
+main table.libs {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+main table.libs td:first-child {
+    font-size: 1.4em;
+}
+
+main table.libs td:first-child a {
+    font-size: 1rem;
+}
+
+main table.libs th:nth-child(1), main table.libs td:nth-child(1),
+main table.libs th:nth-child(2), main table.libs td:nth-child(2),
+main table.libs th:nth-child(3), main table.libs td:nth-child(3) {
+    text-align: center;
+}
+
+main table.libs th:nth-child(4) {
+    text-align: center;
+}
+
+main table.libs td:nth-child(4) {
+    text-align: left;
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    main table.libs th:nth-child(2), main table.libs td:nth-child(2),
+    main table.libs th:nth-child(3), main table.libs td:nth-child(3) {
+        display: none;
+    }
+}
+
+.callout {
+    background: #fffbe6;
+    border-left: 4px solid #fceb75;
+    border-radius: 4px;
+    padding: 0.8em 1em;
+    margin: 1.5em 0;
+}
+
+.callout code {
+    background: rgba(0, 0, 0, 0.06);
+}

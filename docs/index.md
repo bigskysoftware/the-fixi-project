@@ -1,45 +1,25 @@
 ---
 layout: default
 title: The Fixi Project
+heading: '<span class="ico">&#x1F6B2;</span> The Fixi Project'
 ---
-
-# <span class="ico">&#x1F6B2;</span> The Fixi Project
 
 The fixi project is a collection of small web libraries, each one being a
 [lightweight](https://www.youtube.com/watch?v=8BNP126zgPU) take on something else
 [we've](https://four.htmx.org/about) built.
 
-Each library is [constrained](https://quoteinvestigator.com/2014/05/24/art-limit/) to an
-_unminified, uncompressed_ source size that is smaller than (the excellent)
-[Preact](https://preactjs.com/) library's .min.gz'd size
-([~4.7kb](https://bundlephobia.com/package/preact)).
-
-The libraries are:
-
-- <span class="ico">&#x1F6B2;</span> [`fixi`](https://github.com/bigskysoftware/fixi)
-  <small>(3.4kb raw, 1.2kb brotli)</small> inspired by
-  [htmx](https://github.com/bigskysoftware/htmx),
-  [supercharges](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127) your HTML
-- <span class="ico">&#x1F94A;</span> [`moxi`](https://github.com/bigskysoftware/moxi)
-  <small>(4.6kb raw, 1.8kb brotli)</small> inspired by
-  [hyperscript](https://github.com/bigskysoftware/_hyperscript), provides
-  [inline](https://htmx.org/essays/locality-of-behaviour/) scripting and DOM-based reactivity
-- <span class="ico">&#x1F4E1;</span> [`ssexi`](https://github.com/bigskysoftware/ssexi)
-  <small>(4.1kb raw, 1.4kb brotli)</small> inspired by
-  [htmx's SSE extension](https://github.com/bigskysoftware/htmx/blob/four/src/ext/hx-sse.js),
-  provides streaming HTML & events for fixi.js
-- <span class="ico">&#x267B;&#xFE0F;</span> [`paxi`](https://github.com/bigskysoftware/paxi)
-  <small>(1.5kb raw, 0.6kb brotli)</small> inspired by
-  [idiomorph](https://github.com/bigskysoftware/idiomorph), provides DOM patching/morphing
-  and a `morph` swap for fixi.js
-- <span class="ico">&#x1F415;</span> [`rexi`](https://github.com/bigskysoftware/rexi)
-  <small>(4.3kb raw, 1.4kb brotli)</small> inspired by
-  [hyperscript's `fetch` command](https://hyperscript.org/commands/fetch/), provides a set
-  of ergonomic `fetch()` wrappers to make issuing one-off HTTP requests nicer.
+| library                              | size <small>(raw/br)</small> | inspiration                                                                     | provides                                                                          |
+|--------------------------------------|------------------------------|---------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| &#x1F6B2; [`fixi`](fixi.html)        | 3.4/1.2kb                    | [htmx](https://github.com/bigskysoftware/htmx)                                  | [supercharged](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127) HTML      |
+| &#x1F94A; [`moxi`](moxi.html)        | 4.6/1.8kb                    | [hyperscript](https://github.com/bigskysoftware/_hyperscript)                   | [inline](https://htmx.org/essays/locality-of-behaviour/) scripting & reactivity |
+| &#x1F4E1; [`ssexi`](ssexi.html)      | 4.1/1.4kb                    | [hx-sse.js](https://github.com/bigskysoftware/htmx/blob/four/src/ext/hx-sse.js) | streaming HTML & events                                                           |
+| &#x267B;&#xFE0F; [`paxi`](paxi.html) | 1.5/0.6kb                    | [idiomorph](https://github.com/bigskysoftware/idiomorph)                        | DOM patching/morphing                                                             |
+| &#x1F415; [`rexi`](rexi.html)        | 4.3/1.4kb                    | [`fetch`](https://hyperscript.org/commands/fetch/)                              | ergonomic `fetch()` wrappers                                                      |
+{:.libs}
 
 ## Installing {#installing}
 
-Each library is a single standalone script.
+Each library in the fixi project is a single standalone script.
 
 Pick whichever you need and drop it into a page:
 
@@ -89,11 +69,11 @@ Pick whichever you need and drop it into a page:
     </div>
     <label class="install-row">
         <input type="checkbox" class="pick" checked
-               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.1.0/moxi.js"
-               data-sri="sha256-mrpYW3yY45ec7RlIyDVCDx2/NnrZOQNB4v+OavwQo7Q="
+               data-url="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.1.1/moxi.js"
+               data-sri="sha256-FYiaQ07vplZsK/jRKPT0yhLByqgC8cTXwe8SyuRy1lE="
                data-pkg="@bigskysoftware/moxi-js"
-               data-ver="0.1.0">
-        <code>&lt;script src="...<b>@0.1.0/moxi.js</b>"&gt;&lt;/script&gt;</code>
+               data-ver="0.1.1">
+        <code>&lt;script src="...<b>@0.1.1/moxi.js</b>"&gt;&lt;/script&gt;</code>
         <a class="copy" href="#" on-click.halt="let p=this.closest('.install-row').querySelector('.pick');
                                                 await navigator.clipboard.writeText(`&lt;script src=&quot;${p.dataset.url}&quot; integrity=&quot;${p.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
                                                 let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
@@ -144,26 +124,27 @@ Pick whichever you need and drop it into a page:
     </label>
 </div>
 
-NOTE: you will want to load `moxi` _before_ `fixi` so its `on-fx:init` and
-`on-fx:process` handlers are registered before fixi dispatches those events on page load.
+<div class="callout">
+<strong>NOTE:</strong> you will want to load <code>moxi.js</code> <em>before</em> <code>fixi.js</code> so that <code>on-fx:init</code> and <code>on-fx:process</code> handlers are registered before <code>fixi.js</code> dispatches those events on page load.
+</div>
 
-## <span class="ico">&#x1F9F0;</span> The Fixi Project All-in-One <small>(4.5kb brotli)</small> {#all-in-one}
+## <span class="ico">&#x1F9F0;</span> The Fixi Project All-in-One <small>(4.5kb br)</small> {#all-in-one}
 
-All five libraries are also available pre-concatenated, minified, and brotli-compressed in
+All five libraries are also available pre-concatenated, minified, and br-compressed in
 a single file:
 
 <div class="installer">
     <div class="installer-header">
         <div class="installer-actions" style="margin-left:auto">
-            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.1.0/dist/the-fixi-project.min.js"
-                    on-click="let s=`curl -o the-fixi-project@0.1.0.min.js ${this.dataset.url}`;
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.1.1/dist/the-fixi-project.min.js"
+                    on-click="let s=`curl -o the-fixi-project@0.1.1.min.js ${this.dataset.url}`;
                               await navigator.clipboard.writeText(s);
                               let t=this.innerText;
                               this.innerText='copied!';
                               await wait(1200);
                               this.innerText=t">vendor</button>
-            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.1.0/dist/the-fixi-project.min.js"
-                    data-sri="sha256-vgNYRU+0F96B+NgVmelclAT78PRqaAJDEHz5JfynmV0="
+            <button data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.1.1/dist/the-fixi-project.min.js"
+                    data-sri="sha256-aQhU79uUGCZTYXEtsijzqKVynikd1uZqOfGAovLVYOU="
                     on-click="let s=`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`;
                               await navigator.clipboard.writeText(s);
                               let t=this.innerText;
@@ -173,9 +154,9 @@ a single file:
         </div>
     </div>
     <div class="install-row">
-        <code>&lt;script src="...<b>@0.1.0/dist/the-fixi-project.min.js</b>"&gt;&lt;/script&gt;</code>
-        <a class="copy" href="#" data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.1.0/dist/the-fixi-project.min.js"
-                                 data-sri="sha256-vgNYRU+0F96B+NgVmelclAT78PRqaAJDEHz5JfynmV0="
+        <code>&lt;script src="...<b>@0.1.1/dist/the-fixi-project.min.js</b>"&gt;&lt;/script&gt;</code>
+        <a class="copy" href="#" data-url="https://cdn.jsdelivr.net/npm/the-fixi-project@0.1.1/dist/the-fixi-project.min.js"
+                                 data-sri="sha256-aQhU79uUGCZTYXEtsijzqKVynikd1uZqOfGAovLVYOU="
                                  on-click.prevent.stop="await navigator.clipboard.writeText(`&lt;script src=&quot;${this.dataset.url}&quot; integrity=&quot;${this.dataset.sri}&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;`);
                                                         let t=this.innerText; this.innerText='copied!'; await wait(1200); this.innerText=t">copy</a>
     </div>
@@ -186,7 +167,3 @@ Or via npm:
 ```bash
 npm install the-fixi-project
 ```
-
-## Docs
-
-The docs for the project can be found [here](docs.html).

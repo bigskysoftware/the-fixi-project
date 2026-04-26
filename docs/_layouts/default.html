@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ page.title | default: "The Fixi Project" }}</title>
-    <link rel="stylesheet" href="site.css">
-    <script src="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.0.2/moxi.js"
-            integrity="sha256-M38vFJVAnZCtEkqBtfjYijQj2NBLVjrZxA0qvAf8YgU="
+    <link rel="stylesheet" href="{{ '/site.css' | relative_url }}">
+    <script src="https://cdn.jsdelivr.net/npm/@bigskysoftware/moxi-js@0.1.1/moxi.js"
+            integrity="sha256-FYiaQ07vplZsK/jRKPT0yhLByqgC8cTXwe8SyuRy1lE="
             crossorigin="anonymous"></script>
     <script>
         addEventListener('DOMContentLoaded', () => {
@@ -16,6 +16,29 @@
     </script>
 </head>
 <body>
+{% assign u = page.url %}
+{% for item in site.data.nav %}{% if item.url == u %}{% assign cur = forloop.index0 %}{% endif %}{% endfor %}
+{% assign p_idx = cur | minus: 1 %}
+{% assign n_idx = cur | plus: 1 %}
+{% for item in site.data.nav %}{% if forloop.index0 == p_idx %}{% assign prev = item %}{% endif %}{% if forloop.index0 == n_idx %}{% assign nxt = item %}{% endif %}{% endfor %}
+
+<details class="mobilenav">
+    <summary>Menu</summary>
+    <nav>
+        {% for item in site.data.nav %}<a href="{{ item.url | relative_url }}"{% if u == item.url %} class="active"{% endif %}>{% if item.ico %}<span class="ico">{{ item.ico }}</span> {% endif %}{{ item.label }}</a>{% endfor %}
+    </nav>
+</details>
+
+<main>
+    <h1>{{ page.heading | default: page.title | default: "The Fixi Project" }}</h1>
+    <nav class="topnav">
+        {% for item in site.data.nav %}<a href="{{ item.url | relative_url }}"{% if u == item.url %} class="active"{% endif %}>{% if item.ico %}<span class="ico">{{ item.ico }}</span>{% endif %}{{ item.label }}</a>{% endfor %}
+    </nav>
 {{ content }}
+    <nav class="pagination">
+        {% if prev %}<a href="{{ prev.url | relative_url }}" class="prev"><span class="arr">&larr;</span>{% if prev.ico %}<span class="ico">{{ prev.ico }}</span>{% endif %}<span class="lbl">{{ prev.label }}</span></a>{% endif %}
+        {% if nxt %}<a href="{{ nxt.url | relative_url }}" class="next">{% if nxt.ico %}<span class="ico">{{ nxt.ico }}</span>{% endif %}<span class="lbl">{{ nxt.label }}</span><span class="arr">&rarr;</span></a>{% endif %}
+    </nav>
+</main>
 </body>
 </html>
