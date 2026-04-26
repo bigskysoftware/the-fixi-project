@@ -102,17 +102,19 @@ The button's `on-click` handler clears the input via the same `q()` helper.
 
 ### Disable Submit Until Valid
 
-A submit button on a fixi-powered form that stays disabled until every required field
-passes HTML validation:
+This is the signup form from the [fixi page](fixi.html#form-submission), with the
+submit button now staying disabled until every required field passes HTML validation:
 
 ```html
-<form fx-action="/signup" fx-method="POST">
+<form fx-action="/signup" fx-method="POST"
+      fx-target="#status" fx-swap="innerHTML">
     <input name="email" type="email" required placeholder="email">
-    <input name="username" type="text" required minlength="3" placeholder="username">
+    <input name="password" type="password" required minlength="8" placeholder="password">
     <button type="submit" live="this.disabled = !q('closest form').checkValidity()">
-        sign up
+        Sign up
     </button>
 </form>
+<output id="status"></output>
 ```
 
 The `live` expression re-runs whenever any `input` or `change` fires on the page, so

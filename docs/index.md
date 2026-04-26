@@ -167,3 +167,7 @@ Or via npm:
 ```bash
 npm install the-fixi-project
 ```
+
+# License
+
+All fixi projects are [BSD-0 Licensed](https://opensource.org/license/0bsd) and available on [Github](https://github.com/bigskysoftware/the-fixi-project).

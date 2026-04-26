@@ -149,6 +149,64 @@ The server returns either the display row or the edit form depending on the URL.
 edit form posts back to the same row id; the response replaces it with a fresh display
 row. 
 
+### Form Submission
+
+When the fixi-powered element is a `<form>`, the `submit` event triggers the
+request & fixi includes the form's inputs in the request body (or URL):
+
+```html
+<form fx-action="/signup" fx-method="POST"
+      fx-target="#status" fx-swap="innerHTML">
+    <input name="email" type="email" required placeholder="email">
+    <input name="password" type="password" required minlength="8" placeholder="password">
+    <button type="submit">Sign up</button>
+</form>
+<output id="status"></output>
+```
+
+On submit, fixi `POST`s the email and password as form data and swaps whatever HTML
+comes back into `#status`.
+
+### Click to Delete
+
+`fx-method="DELETE"` issues a DELETE request: if the server responds with an empty
+body, the default `outerHTML` swap removes the targeted element from the DOM.
+
+```html
+<li id="todo-42">
+    Buy milk
+    <button fx-action="/todos/42" fx-method="DELETE"
+            fx-target="#todo-42" fx-swap="outerHTML">x</button>
+</li>
+```
+
+The button targets its containing `<li>` so the whole row vanishes when the server
+responds.
+
+### Load More
+
+The Load More button sits in the last row of a table, spanning all columns. By
+targeting that row and relying on the default `outerHTML` swap, clicking the button
+replaces the whole row with more data rows plus a fresh "Load more" row:
+
+```html
+<table>
+    <tbody>
+        <tr><td>Ada</td><td>ada@example.com</td></tr>
+        <tr><td>Grace</td><td>grace@example.com</td></tr>
+        <tr id="more">
+            <td colspan="2">
+                <button fx-action="/people?page=2" fx-target="#more">Load more</button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+```
+
+The server responds with the next page of `<tr>` rows followed by a fresh
+`<tr id="more">` row pointing at `?page=3`. When the pages run out, the server omits
+the placeholder row and the pagination ends naturally.
+
 ### Lazy Loading
 
 Any fixi event can be used as an `fx-trigger`, including the `fx:init` event that fires
