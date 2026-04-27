@@ -6,7 +6,7 @@ heading: '<span class="ico">&#x1F6B2;</span> <code>fixi.js</code>: turbocharged 
 
 ## Overview
 
-`fixi.js`(TODO: size) is a miniature version of [htmx](https://htmx.org) and offers similar,
+`fixi.js`(3.4kb raw / 1.2kb brotli) is a miniature version of [htmx](https://htmx.org) and offers similar,
 simplified functionality. It makes it possible for any element to issue HTTP requests
 in response to any event, and place the response HTML anywhere in the document.
 
