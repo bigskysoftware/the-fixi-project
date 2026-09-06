@@ -20,7 +20,7 @@ main {
     margin: 1em 0 2em;
     display: flex;
     flex-wrap: nowrap;
-    gap: 1.1em;
+    gap: 0.8em;
     justify-content: center;
     align-items: center;
 }
@@ -32,7 +32,7 @@ main {
     color: #2563eb;
     text-decoration: none;
     white-space: nowrap;
-    font-size: 1.1em;
+    font-size: 1em;
 }
 
 .topnav a:hover .lbl { text-decoration: underline; }
