@@ -136,7 +136,8 @@ From a fresh checkout of this repo:
 npm install         # installs playwright + terser (dev-only)
 npm run clone       # clones each sub-project repo into its directory
 npm test            # runs the full test suite across all libraries (headless)
-npm run build       # builds the all-in-one bundle into dist/
+npm run build       # builds the all-in-one bundle into dist/, regenerates docs/llms.txt
+npm run llms        # cats the library READMEs into docs/llms.txt
 npm run demo        # runs the demo app on http://localhost:8765
 npm run serve       # serves the docs site on http://localhost:4000
 ```

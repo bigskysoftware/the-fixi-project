@@ -1,0 +1,2272 @@
+# The Fixi Project
+
+
+The [fixi project](https://fixiproject.org) is a family of web libraries designed to
+work together to make web development more enjoyable.
+
+Each individual library is [constrained](https://quoteinvestigator.com/2014/05/24/art-limit/) to an
+_unminified, uncompressed_ source size smaller than (the excellent) [Preact](https://preactjs.com/) library's .min.gz'd
+size ([~4.7kb](https://bundlephobia.com/package/preact)).
+
+The full project is ~4.5kb [minified & brotli-compressed](/#all-in-one).
+
+## The Libraries
+
+There are five libraries in the fixi project:
+
+- <span class="ico">&#x1F6B2;</span> [`fixi.js`](fixi.html) - the flagship library, which allows an element to issue an
+  HTTP
+  request based on any event and place the response HTML anywhere in the DOM.
+- <span class="ico">&#x1F94A;</span> [`moxi.js`](moxi.html) - allows you to place scripts for arbitrary events on an
+  element,
+  and provides helpers for making common scripting needs simpler. Also supports simple DOM-based reactivity.
+- <span class="ico">&#x267B;&#xFE0F;</span> [`paxi.js`](paxi.html) - provides morphing functionality, allowing you to
+  merge
+  new content into the DOM without doing a full swap, which preserves focus, input values, etc.
+- <span class="ico">&#x1F4E1;</span> [`ssexi.js`](ssexi.html) - extends `fixi.js` to handle
+  streaming [Server Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events).
+- <span class="ico">&#x1F415;</span> [`rexi`](rexi.html) - Provides ergonomic `fetch()` wrappers that make issuing HTTP
+  requests from scripting less painful.
+
+## A fixi Application
+
+A "standard" fixi-powered web application would typically use:
+
+- plain [links](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/a) for navigation between pages
+- fixi for any in-page interactivity that requires server communication
+- moxi for any small bits of client-side behavior: open/close, switching tabs, debounced events, enabling elements
+- ssexi for live notifications or other content from the server
+- paxi for `morph` swaps in fixi when focus & input needs to remain stable
+- rexi when scripting-based HTTP requests are needed
+
+The ethos of fixi is: less is more.
+
+Next up: the flagship library, [fixi.js](fixi.html).
+# fixi.js
+
+<h1>&#x1F6B2; fixi.js - <i>it ain't much...</i></h1> 
+
+
+[fixi.js](https://swag.htmx.org/products/fixi-js-tee) is an experimental, minimalist implementation
+of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127)
+
+fixi.js is the flagship library of the [fixi project](https://fixiproject.org), a family of minimalist companion libraries.
+
+The fixi [api](#api) consists of six [HTML attributes](#attributes), nine [events](#events) & two [properties](#properties)
+
+Here is an example:
+
+```html
+<button fx-action="/content" <!-- URL to issue request to -->
+        fx-method="get"      <!-- HTTP Method to use -->
+        fx-trigger="click"   <!-- Event that triggers the request -->
+        fx-target="#output"  <!-- Element to swap -->
+        fx-swap="innerHTML"> <!-- How to swap -->
+    Get Content
+</button>
+<output id="output"></output>
+```
+
+When this fixi-powered `button` is clicked it  will issue an HTTP `GET` request to the 
+`/content` [relative URL](https://www.w3.org/TR/WD-html40-970917/htmlweb.html#h-5.1.2) and swap the HTML content of 
+the response inside the `output` tag below it.
+
+## Minimalism
+
+Philosophically, fixi is [scheme](https://scheme.org/) to [htmx](https://htmx.org)'s
+[common lisp](https://lisp-lang.org/): it is designed to be as 
+[lean as possible](https://ia601608.us.archive.org/8/items/pdfy-PeRDID4QHBNfcH7s/LeanSoftware_text.pdf) while still 
+being useful for real world projects.
+
+As such, it doesn't have many of the features found in htmx, including:
+
+* [request queueing & synchronization](https://htmx.org/attributes/hx-sync/)
+* [extended selector support](https://htmx.org/docs/#extended-css-selectors)
+* [extended event support](https://htmx.org/docs/#special-events)
+* [attribute inheritance](https://htmx.org/docs/#inheritance)
+* [request indicators](https://htmx.org/docs/#indicators)
+* [CSS transitions](https://htmx.org/docs/#css_transitions)
+* [history support](https://htmx.org/docs/#history)
+
+fixi takes advantage of some modern JavaScript features not used by htmx:
+
+* [`async` functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
+* The [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+* The use of [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) for monitoring when new content is added
+* The [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) (used by htmx, but the sole mechanism for transitions in fixi)
+
+A hard constraint on the project is that the _unminified_, _uncompressed_ size must be less than that of
+the minified & compressed version of the (excellent) [preact library](https://bundlephobia.com/package/preact) (currently 4.6Kb).
+
+The current uncompressed size is `3473` bytes, the gzipped size is `1473` bytes and the brotli'd size is `1278` bytes,
+as determined by:
+
+```bash
+ls -l fixi.js | awk  '{print "raw:", $5}'; gzip -k fixi.js; ls -l fixi.js.gz | awk  '{print "gzipped:", $5}'; rm fixi.js.gz; brotli fixi.js; ls -l fixi.js.br | awk  '{print "brotlid:", $5}'; rm fixi.js.br
+```
+
+Another goal is that users should be able to [debug](https://developer.chrome.com/docs/devtools/javascript/) 
+fixi easily, since it is small enough to use unminified.
+
+The code style is [dense](fixi.js), but the statements are structured for debugging.
+
+Like a fixed-gear bike, fixi has very few moving parts:
+
+* No dependencies (including test and development)
+* No JavaScript API (beyond the [events](#events))
+* No minified `fixi.min.js` file
+* No `package.json`
+* No build step
+
+This repo consists of four files:
+
+* [`fixi.js`](fixi.js), the code for the library
+* [`test.html`](test.html), the test suite for the library
+* This [`README.md`](README.md), which is the documentation
+* [`npm.sh`](npm.sh), which generates npm releases of the library
+
+[`test.html`](test.html) is a stand-alone HTML file that implements its own visual testing infrastructure, mocking for 
+`fetch()`, etc. and that can be opened using the `file:` protocol for easy testing.
+
+## Installing
+
+fixi is designed to be easily [vendored](https://htmx.org/essays/vendoring/), that is, copied, into your project:
+
+```bash
+curl https://raw.githubusercontent.com/bigskysoftware/fixi/refs/tags/0.9.4/fixi.js >> fixi-0.9.4.js
+```
+
+The SHA256 of v0.9.4 is 
+
+`rPuE58bCyMrZ37o4bByX4epgBA1bAeTylp7TxOXVh90=`
+
+generated by the following command line script:
+
+```bash
+cat fixi.js | openssl sha256 -binary | openssl base64
+```
+Alternatively can download the source from here:
+
+<https://github.com/bigskysoftware/fixi/archive/refs/tags/0.9.4.zip>
+
+You can also use the JSDelivr CDN for local development or testing:
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/bigskysoftware/fixi@0.9.4/fixi.js"
+        crossorigin="anonymous"
+        integrity="sha256-Qalmv6iqaAnrglOx2AWSoLfJFmXLGtjAIdBgsLc3bgg="></script>
+```
+
+Finally, fixi is available on NPM as the [`fixi-js`](https://www.npmjs.com/package/fixi-js) package.
+
+## Support
+
+You can get support for fixi via:
+
+* [Github Issues](https://github.com/bigskysoftware/fixi/issues)
+* [The htmx Discord `#fixi` channel](https://htmx.org/discord)
+
+## API
+
+### Attributes
+
+| attribute | description | example |
+| --- | --- | --- |
+| `fx-action` | The URL to which an HTTP request will be issued, required | `fx-action='/demo'` |
+| `fx-method` | The HTTP Method that will be used for the request (case-insensitive), defaults to `GET` | `fx-method='DELETE'` |
+| `fx-target` | A CSS selector specifying where to place the response HTML in the DOM, defaults to the current element | `fx-target='#a-div'` |
+| `fx-swap` | A string specifying how the content should be swapped into the DOM, can be one of `innerHTML`, `outerHTML`, `beforebegin`, `afterbegin`, `beforeend`, `afterend`, `none`, or any valid property on the element (e.g. `className` or `value`), defaults to `outerHTML` | `fx-swap='innerHTML'` |
+| `fx-trigger` | The event that will trigger a request, defaults to `submit` for `form` elements, `change` for `input`-like elements & `click` for all other elements | `fx-trigger='click'` |
+| `fx-ignore` | Any element with this attribute on it or on an ancestor will not be processed for `fx-*` attributes | |
+
+#### Modus Operandi
+
+fixi works in a straight-forward manner & I encourage you to look at [the source](fixi.js) as you read through this. The 
+three components of fixi are:
+
+* [Processing](#processing) elements in the DOM (or added to the DOM)
+* Issuing HTTP [requests](#requests) in response to events
+* [Swapping](#swapping) new HTML content into the DOM
+
+##### Processing
+
+The main entry point is found at the bottom of [fixi.js](fixi.js): on the `DOMContentLoaded` event fixi does two things:
+
+* It has a MutationObserver begin to watch for newly added content with fixi-powered elements
+* It processes any existing fixi-powered elements
+
+fixi-powered elements are elements with the `fx-action` attribute on them.
+
+When fixi finds one it will establish an event listener on that element that will dispatch an AJAX request via 
+`fetch()` to the URL specified by `fx-action`.
+
+fixi will ignore any elements that have the `fx-ignore` attribute on them or on an ancestor.
+
+The event that will trigger the request is determined by the `fx-trigger` attribute.
+
+If that attribute is not present, the trigger defaults to:
+
+* `submit` for `form` elements
+* `change` for `input:not([type=button])`, `select` & `textarea` elements
+* `click` for everything else.
+
+##### Requests
+
+When a request is triggered, the [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) of the request 
+will be determined by the `fx-method` attribute.  If this attribute is not present, it will default to `GET`.  This 
+attribute is case-insensitive.
+
+fixi sends the [request header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers) `FX-Request`, with the value 
+`true`.  You can add or remove headers using the `evt.detail.cfg.headers` object, see the [`fx:config`](#fxconfig) event 
+below.
+
+If an element is within a form element or has a `form` attribute, the values of that form will be included with the
+request.  Otherwise, if the element has a `name`, its `name` & `value` will be sent with the request.   You can add or 
+remove values using the `evt.detail.cfg.body` `FormData` object in the [`fx:config`](#fxconfig) event.
+
+`GET` & `DELETE` requests will include values via query parameters, other request types will submit them as a form
+encoded body.
+
+Before a request is sent, the aforementioned [`fx:config`](#fxconfig) event is triggered, which can be used to configure
+aspects of the request. If `preventDefault()` is invoked in this event, the request will not be sent.
+The `evt.detail.cfg.drop` property will be [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy)
+if there is an existing outstanding request associated with the element, otherwise the value will be
+[falsy](https://developer.mozilla.org/en-US/docs/Glossary/Falsy). More specifically, the value is equal
+to the number of outstanding requests associated with the element. If the value is truthy after the last
+`fx:config` handler has ran to completion, the request will be dropped (i.e. not issued). This implies,
+if you do not [customize the behavior](#replace-existing-requests-in-flight), an element will drop all
+new requests whilst there is an outstanding request associated with it.
+
+In the [`fx:config`](#fxconfig) event you can also set the `evt.detail.cfg.confirm` property to a no-argument function.
+This function can return a Promise and can be used to asynchronously confirm that the request should be issued:
+
+```js
+function showAsynConfirmDialog() {
+    //... a Promise-based confirmation dialog...
+}
+
+document.addEventListener("fx:config", (evt) => {
+    evt.detail.cfg.confirm = showAsynConfirmDialog;
+})
+```
+
+Note that confirmation will only occur if the [`fx:config`](#fxconfig) event is not canceled and the request is not
+dropped.
+
+After the configuration step and the confirmation, if any, the [`fx:before`](#fxbefore) event will be triggered,
+and then a `fetch()` will be issued.  The `evt.detail.cfg` object from the events above  is passed to the `fetch()` 
+function as the second [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) argument.
+
+When fixi receives a response it triggers the [`fx:after`](#fxafter) event.
+
+In this event there are two more properties available on `evt.detail.cfg`:
+
+* `response` the fetch [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object
+* `text` the text of the response
+
+These can be inspected, and the `text` value can be changed if you want to transform it in some way.
+
+If a network error occurs the [`fx:error`](#fxerror) event will be triggered instead of `fx:after`, and nothing
+will be swapped.
+
+Note that `fetch()` only triggers errors 
+[when a request fails due to a bad URL or network error](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch),
+so valid HTTP responses with non-`200` response codes will not trigger an error.  
+
+If you wish to handle non-200 reponses differently you should check the response code in the `fx:after` event:
+
+```js
+document.addEventListener("fx:after", (evt)=>{
+  // rewire 404s to the body, remove current head so new head can replace it
+  if (evt.detail.cfg.response.status == 404){
+    document.head.remove()
+    evt.detail.cfg.target = document.body
+    evt.detail.cfg.swap = 'outerHTML'
+  }
+})
+```
+
+The [`fx:finally`](#fxfinally) event will be triggered regardless if an error occurs or not.
+
+##### Swapping
+
+fixi then swaps the response text into the DOM using the mechanism specified by `fx-swap`, targeting the element specified
+by `fx-target`.  If the `fx-swap` attribute is not present, fixi will use `outerHTML`.
+
+If the `fx-target` attribute is not present, it will target the element making the request.  
+
+The swap mechanism and target can be changed in the request-related fixi events.
+
+You can implement a custom swapping mechanism by setting a function into the `evt.detail.cfg.swap` property in one of
+the request related events.  This function should take one argument that will be set to the fixi request config itself.  
+On that object you can access the `target`, `text`, `request`, etc.  You can see 
+an [example below](#custom-swapping-algorithms) showing how to do this.
+
+By default, swapping will occur in a [View Transition](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API)
+if they are available.  If you don't want this to occur, you can set the `evt.detail.cfg.transition` property to false
+in one of the request-related events.
+
+Finally, when the swap and any associated View Transitions have completed, the `fx:swapped` event will be triggered on 
+the element.  If the element has been removed from the DOM, the event will also be triggered on `document`, which allows
+you to listen for this event on `document` and receive it after every swap.
+
+###### Notes on Targeting the Document Element (`html`)
+
+Note that if you want to replace the entire document (that is, target the `html` element) you _must_ use an `innerHTML`
+swap, because the default `outerHTML` swap will fail with a [`NoModificationAllowed`](https://developer.mozilla.org/en-US/docs/Web/API/DOMException#nomodificationallowederror)
+error.
+
+If you wish to default the swap mechanism to `innerHTML` when targeting the `html` you can use this code:
+
+```js
+document.addEventListener("fx:config", (evt) => {
+    if (evt.detail.cfg.target === document.documentElement){
+        evt.detail.cfg.swap = "innerHTML"
+    }
+})
+```
+
+Note also that if you replace the `head` tag, due to the [quirks of the DOM API specification](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML#security_considerations), 
+styles _will_ be updated, but _scripts_ will not be executed.  
+
+You must therefore manually manage and execute any script tags:
+
+```js
+document.addEventListener("fx:config", (evt) => {
+    if (evt.detail.cfg.target === document.documentElement){
+        let scripts = document.head.querySelectorAll("script");
+        for(let script of scripts) { 
+            let newScript = document.createRange().createContextualFragment(script.outerHTML)
+            document.head.insertBefore(newScript, script)
+            script.remove()
+        }
+    }
+})
+```
+
+For inline scripts where [Locality of Behavior](https://htmx.org/essays/locality-of-behaviour) is desired. 
+The target scripts need to be replaced in order to execute.  
+
+This will automatically execute all script tags that are swapped in:
+
+```js
+document.addEventListener('fx:swapped', (evt) => {
+    evt.detail.cfg.target.querySelectorAll('script').forEach(s =>
+        s.replaceWith(Object.assign(document.createElement('script'),{textContent:s.textContent}))
+    )
+})
+```
+
+However, these simple approaches may fail if you have scripts that, for example, create global variables with `let`, etc.
+
+For this reason we broadly recommend loading all your scripts up front or simply using anchor tags for full page 
+navigations, unless you want to get into the weeds of dealing with these issues.
+
+#### Complete Example
+
+Here is a complete example using all the attributes available in fixi:
+
+```html
+<button fx-action="/demo" fx-method="GET" 
+        fx-target="#output" fx-swap="innerHTML" 
+        fx-trigger="click">
+    Get Content
+</button>
+<output id="output" fx-ignore>--</output>
+```
+
+In this example, the button will issue a `GET` request to `/demo` and put the resulting HTML into the `innerHTML` of the
+output element with the id `output`.
+
+Because the `output` element is marked as `fx-ignore`, any `fx-action` attributes in the new content will be ignored.
+
+### Events
+
+fixi fires the following events, broken into two categories:
+
+[Initialization events](#initialization-events):
+
+| event | description |
+| --- | --- |
+| [`fx:init`](#fxinit) | triggered on elements that have a `fx-action` attribute and are about to be initialized by fixi |
+| [`fx:inited`](#fxinited) | triggered on elements have been initialized by fixi (does **not** bubble) |
+| [`fx:process`](#fxprocess) | fixi listens on the `document` object for this event and will process (that is, enable any fixi-powered elements) within that element. |
+
+[Fetch events](#fetch-events):
+
+| event | description |
+| --- | --- |
+| [`fx:config`](#fxconfig) | triggered on an element immediately when a request has been triggered, allowing users to configure the request |
+| [`fx:before`](#fxbefore) | triggered on an element just before a `fetch()` request is made |
+| [`fx:after`](#fxafter) | triggered on an element just after a `fetch()` request finishes normally but before content is swapped |
+| [`fx:error`](#fxerror) | triggered on an element if something is thrown from a `fetch()` |
+| [`fx:finally`](#fxfinally) | triggered on an element after a request no matter what |
+| [`fx:swapped`](#fxswapped) | triggered after the swap and any associated [View Transition](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) has completed |
+
+#### Initialization Events
+
+##### `fx:init`
+
+The `fx:init` event is triggered when fixi is processing a node with an `fx-action` attribute. One property
+is available in `evt.detail`:
+
+* `options` - An [Options Object](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#options)
+              that will be passed to `addEventListener()`
+
+If this event is cancelled via `preventDefault()`, the element will not be initialized by fixi.
+
+##### `fx:inited`
+
+The `fx:inited` event is triggered when fixi finished processing a node with an `fx-action` attribute.
+
+Unlike other fixi events, this event does not bubble.
+
+##### `fx:process`
+
+fixi listens for the `fx:process` event on the `document` and will enable any unprocessed fixi-powered elements within
+the element as well as the element itself.  
+
+#### Fetch Events
+
+fixi uses the [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) to issue HTTP requests. It
+triggers events around this call that allow users to configure the request.
+
+##### `fx:config`
+
+The first event triggered is `fx:config`. This event can be used to configure the arguments passed to `fetch()` via the
+fixi config object, which can be found at `evt.detail.cfg`.
+
+This config object has the following properties:
+
+* `trigger` - The event that triggered the request
+* `method` - The HTTP Method that is going to be used
+* `action` - The URL that the request is going to be issued to
+* `headers` - An Object of name/value pairs to be sent as HTTP Request Headers
+* `target` - The target element that will be swapped when the response is processed
+* `swap` - The mechanism by which the element will be swapped
+* `body` - The body of the request, if present, a FormData object that holds the data of the form associated with the request
+* `drop` - Whether this request will be dropped, defaults to the number of outstanding requests associated with the element
+* `transition` - The View Transition function, if it is available.  Set to `false` if you don't want a transition to occur
+* `preventTrigger` - A boolean (defaults to `true`) that, if true, will call `preventDefault()` on the triggering event
+* `signal` - The AbortSignal of the related AbortController for the request
+* `abort()` - A function that can be invoked to abort the pending fetch request
+* `fetch()` - The fetch() function that will be used for the request, can be used for [mocking](#mocking) requests
+
+Mutating the `method`, etc. properties of the `cfg` object will change the behavior of the request dynamically. Note
+that the `cfg` object is passed to `fetch()` as the second argument of type `RequestInit`, so any properties you want
+to set on the `RequestInit` may be set on the `cfg` object (e.g. `credentials`).
+
+Another property available on the `detail` of this event is `requests`, which will be a 
+[Set](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set) of any existing
+outstanding requests for the element.
+
+###### replace existing requests in flight
+fixi does not implement request queuing like htmx does, but you can implement a simple
+"replace existing requests in flight" rule with the following JavaScript:
+
+```js
+document.addEventListener("fx:config", (evt) => {
+    evt.detail.cfg.drop = 0;  // allow this request to be issued even if there are other requests
+    evt.detail.requests.forEach((cfg) => cfg.abort()); // abort all existing requests
+})
+```
+
+If you call `preventDefault()` on this event, no request will be issued.
+
+##### `fx:before`
+
+The  `fx:before` event is triggered just before a `fetch()` is issued. The config will again be available in the
+`evt.detail.cfg` property, but after any confirmation is done.  The requests will also be available in 
+`evt.detail.requests` and will include the current request.
+
+If you call `preventDefault()` on this event, no request will be issued.
+
+##### `fx:after`
+
+The  `fx:after` event is triggered after a `fetch()` successfully completes. The config will again be available in the
+`evt.detail.cfg` property, and will have two additional properties:
+
+* `response` - The response object from the `fetch()` call
+* `text` - The text of the response
+
+At this point you may still mutate the `swap`, etc. attributes to affect swapping, and you may mutate the `text` if you
+want to modify it is some way before it is swapped.
+
+Calling `preventDefault()` on this event will prevent swapping from occurring.
+
+##### `fx:error`
+
+The  `fx:error` event is triggered when a network error occurs or when the request is aborted using the
+`abort` function on the config. In this case the `evt.detail.cfg` object is available for modification
+and `cfg.response` and `cfg.text` will not be present. The `evt.detail.error` property contains the
+thrown value. If you receive this event, swapping will not occur, the processing is terminated early.
+
+##### `fx:finally`
+
+The  `fx:finally` event is triggered regardless if an error occurs or not and can be used to clean up after a request.
+Again the `evt.detail.cfg` object is available for modification.
+
+##### `fx:swapped`
+
+The  `fx:swapped` event is triggered once the swap and any associated View Transitions complete.  The 
+`evt.detail.cfg` object is available.
+
+### Properties
+
+fixi adds two properties to elements in the DOM
+
+| property | description |
+| --- | --- |
+| [`document.__fixi_mo`](#document__fixi_mo) | The MutationObserver that fixi uses to watch for new content to process new fixi-powered elements. |
+| [`elt.__fixi`](#elt__fixi) | The event handler created by fixi on fixi-powered elements |
+
+#### `document.__fixi_mo`
+
+fixi stores the Mutation Observer that it uses to watch for new content in the `__fixi_mo` property on the `document`.
+
+You can use this property to temporarily disable mutation observation for performance reasons:
+
+```js
+// disable processing
+document.__fixi_mo.disconnect()
+
+/* ... heavy mutation code that should not be processed by fixi */
+
+// reenable processing
+document.__fixi_mo.observe(document.body, {childList:true, subtree:true})
+```
+Similar code can be used to adjust the MutationObserver to listen for mutations in some subset of the document.
+
+Finally, you can also switch to entirely manual processing using the [`fx:after`](#fxafter), 
+[`fx:swapped`](#fxswapped) & [`fx:process`](#fxprocess) events:
+
+```js
+document.__fixi_mo.disconnect()
+document.addEventListener("fx:after", (evt)=>{
+  // capture the parent element of the target in the config before swapping
+  evt.detail.cfg.parent = evt.detail.cfg.target.parentElement
+})
+document.addEventListener("fx:swapped", (evt)=>{
+  // reprocess the parent
+  evt.detail.cfg.parent.dispatchEvent(new CustomEvent("fx:process"), {bubbles:true})
+})
+```
+
+#### `elt.__fixi`
+
+The `__fixi` property will be added to any element that has an `fx-action` attribute on it assuming that the element
+or an ancestor is not marked `fx-ignore`.  
+
+The value of the property will be the event listener that is added to the element.  It also has two properties:
+
+* `evt` - the string event name that will trigger the handler
+* `requests` - the config values of any open requests (may be `null`)
+
+This property can be used to remove the fixi-generated event handler like so:
+
+```js
+elt.removeEventListener(elt.__fixi.evt, elt.__fixi)
+```
+
+If you want to reprocess the element you will need to remove the property entirely and trigger the 
+[`fx:process`](#fxprocess) event on it:
+
+```js
+elt.removeEventListener(elt.__fixi.evt, elt.__fixi)
+delete elt.__fixi
+elt.dispatchEvent(new CustomEvent("fx:process"), {bubbles:true})
+```
+
+You can also use this property to store extension-related information.  See the [polling example](#polling) below.
+
+### Defaults via `window.fixiCfg`
+
+You can change a few of fixi's per-request defaults by assigning a global `fixiCfg` object.
+
+```html
+<script>
+    var fixiCfg = {
+        swap: "morph",
+        transition: false,
+        headers: {"X-CSRF-Token": "abc123"},
+    }
+</script>
+<script src="fixi.js"></script>
+```
+
+| key | effect |
+| --- | --- |
+| `swap` | Default value for `cfg.swap` when an element has no `fx-swap` attribute |
+| `transition` | Replaces the default `document.startViewTransition` binding. Set to `false` to disable view transitions entirely. Set to a function with the same shape as `startViewTransition` to plug in a custom wrapper. |
+| `headers` | Merged into the default `{"FX-Request": "true"}` headers; user-supplied keys win on collision. |
+
+Note that any [`fx:config`](#fxconfig) listener can override these defaults by mutating `evt.detail.cfg`, so per-element behavior is unaffected.
+
+## Mocking
+
+It is easy to mock `fetch()` requests in fixi by replacing the `evt.detail.cfg.fetch` property with a mocking function.
+The function can take the same arguments as [`fetch()`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) (or not
+if they are not needed) and should return a [`Response`](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+compatible object or a Promise that resolves to one.
+
+For the simple case, the return object need only implement the `.text()` method.
+
+Here is an example that mocks responses using `template` elements
+
+```js
+document.addEventListener("fx:config", (evt) => {
+   const template = document.getElementById(evt.detail.cfg.action)
+   if (template) {
+     evt.detail.cfg.fetch = ()=>({text:  ()=>template.innerHTML}) // note the parens to make {} an object
+   }
+ })
+```
+```html
+<button fx-action="/demo">
+    Replace Me With A Template
+</button>
+<template id="/demo">
+    Some Template Content...
+</template>
+```
+
+## Examples
+
+Here are some basic examples of fixi in action
+
+### Click To Edit
+
+The htmx [click to edit example](https://htmx.org/examples/click-to-edit/) can be easily ported to fixi:
+
+```html
+<div id="target-div">
+    <div><label>First Name</label>: Joe</div>
+    <div><label>Last Name</label>: Blow</div>
+    <div><label>Email</label>: joe@blow.com</div>
+    <button fx-action="/contact/1/edit" fx-target="#target-div" class="btn primary">
+    Click To Edit
+    </button>
+</div>
+```
+
+### Delete Row
+
+The [delete row example](https://htmx.org/examples/delete-row/) from htmx can be implemented in fixi like so:
+
+```html
+<tr id="row-1">
+  <td>Angie MacDowell</td>
+  <td>angie@macdowell.org</td>
+  <td>Active</td>
+  <td>
+    <button class="btn danger" fx-action="/contact/1" fx-method="delete" fx-target="#row-1">
+      Delete
+    </button>
+  </td>
+</tr>
+```
+
+Note that this version does not have a confirmation prompt, you would need to implement that yourself using the
+[`fx:config`](#fxconfig) event.
+
+### Lazy Loading
+
+The htmx [lazy loading](https://htmx.org/examples/lazy-load/) example can be ported to fixi using the 
+[`fx:inited`](#fxinited) event:
+
+```html
+<div fx-action="/lazy-content" fx-trigger="fx:inited">
+  Content Loading...
+</div>
+```
+
+## Cross-Origin Requests
+
+fixi uses the browser's [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) defaults, which
+allow cross-origin requests. This means `fx-action` can point to any URL, including external domains.
+
+If you want to restrict requests to same-origin only, you can set `mode: "same-origin"` on the config object via
+the `fx:config` event:
+
+```js
+document.addEventListener("fx:config", (evt)=>{
+    evt.detail.cfg.mode = "same-origin"
+})
+```
+
+You can also enforce this at the browser level with the
+[`Content-Security-Policy: connect-src`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/connect-src)
+HTTP header, which restricts all `fetch()` (and XHR, WebSocket, etc.) connections to the specified origins:
+
+```http
+Content-Security-Policy: connect-src 'self'
+```
+
+## Extensions
+
+Because fixi is minimalistic the user is responsible for implementing many behaviors they want via events. We have
+already seen how to abort an existing request that is already in flight.  
+
+A suggested convention when you are adding fixi extension attributes is to use the `ext-fx` prefix, and to process the extension
+in the `fx:init` method.  You may find it useful to use the `__fixi` property on the element to store values necessary
+for the extension to work.
+
+Another suggested convention is keeping your fixi extensions in a single file called `ext-fixi.js` alongside your
+`fixi-<version>.js` file.
+
+Here are some examples of useful fixi extensions implemented using events.
+
+### Disabling an Element During A Request
+
+Here is an example that will use attributes to disable an element when a request is in flight:
+
+```js
+// fixi disable elements extension
+document.addEventListener("fx:init", (evt)=>{
+  if (evt.target.matches("[ext-fx-disable]")){
+    var disableSelector = evt.target.getAttribute('ext-fx-disable')
+    evt.target.addEventListener('fx:before', ()=>{
+      let disableTarget = disableSelector == "" ? evt.target : document.querySelector(disableSelector)
+      disableTarget.disabled = true
+      evt.target.addEventListener('fx:after', (afterEvt)=>{
+        if (afterEvt.target == evt.target){
+          disableTarget.disabled = false
+        }
+      })
+    })
+  }
+})
+```
+```html
+<button fx-action="/demo" ext-fx-disable>
+  Demo
+</button>
+```
+
+### Showing an Indicator During A Request
+
+Here is an example that will use attributes a `fixi-request-in-flight` class to show an indicator of some kind:
+
+```js
+// fixi request indicator extension
+document.addEventListener("fx:init", (evt)=>{
+  if (evt.target.matches("[ext-fx-indicator]")){
+    var disableSelector = evt.target.getAttribute("ext-fx-indicator")
+    evt.target.addEventListener("fx:before", ()=>{
+      let disableTarget = disableSelector == "" ? evt.target : document.querySelector(disableSelector)
+      disableTarget.classList.add("fixi-request-in-flight")
+      evt.target.addEventListener("fx:after", (afterEvt)=>{
+        if (afterEvt.target == evt.target){
+          disableTarget.classList.remove("fixi-request-in-flight")
+        }
+      })
+    })
+  }
+})
+```
+```html
+<style>
+  #indicator {
+    display: none;
+  }
+  #indicator.fixi-request-in-flight {
+    display: inline-block;
+  }
+</style>
+<button fx-action="/demo" ext-fx-indicator="#indicator">
+    Demo
+   <img src="spinner.gif" id="indicator">
+</button>
+```
+
+This example can be modified to use classes or other mechanisms for showing indicators as well.
+
+### Debouncing A Request
+
+The following extension allows you to [debounce](https://www.geeksforgeeks.org/debouncing-in-javascript/) the
+triggering event for a fixi-powered element.  It does this by removing the initial listener installed by fixi and
+wiring in a new listener for the same event that delegates to the fixi handler if no other events occur in the
+given time period.  The debouncing time is specified via the `ext-fx-debounce` attribute, which specified the number of
+milliseconds to wait before triggering the request.
+
+```js
+// fixi event debouncing extension
+document.addEventListener("fx:init", (evt)=>{
+    let target = evt.target
+    // if this element has the debounce extention
+    if (target.hasAttribute("ext-fx-debounce")){
+        // add a listener for the fx:inited event, when the __fixi property is available
+        target.addEventListener("fx:inited", ()=>{
+            // remove the default listener 
+            target.removeEventListener(target.__fixi.evt, target.__fixi)
+            let debounceTime = parseInt(target.getAttribute("ext-fx-debounce"))
+            let timeout = null
+            // install a debounced version that delegates to the default listener 
+            target.addEventListener(target.__fixi.evt, (evt)=>{
+                clearTimeout(timeout)
+                timeout = setTimeout(()=>target.__fixi(evt), debounceTime)
+            })
+        })
+    }
+})
+```
+
+Here is an implementation of the [active search](https://htmx.org/examples/active-search/) example from the htmx website
+using this extension:
+
+```html
+<form action="/search" fx-action="/search" fx-target="#results" fx-swap="innerHTML">
+  <input id="search" type="search" fx-action="/search" fx-trigger="input" ext-fx-debounce="200" fx-target="#results" fx-swap="innerHTML"/>
+  <button type="submit">
+    Search
+  </button>
+</form>
+<table>
+  ...
+  <tbody id="results">
+  ...
+  </tbody>
+</table>
+```
+
+### Polling
+
+htmx-style polling can be implemented in the following manner:
+
+```js
+// fixi polling extension
+document.addEventListener("fx:init", (evt)=>{
+  let elt = evt.target
+  if (elt.matches("[ext-fx-poll-interval]")){
+    // wait for the non-bubbling fx:inited event on the element so the __fixi property is available
+    elt.addEventListener("fx:inited", ()=>{
+        // squirrel away in case we want to call clearInterval() later
+        elt.__fixi.pollInterval = setInterval(()=>{
+            elt.dispatchEvent(new CustomEvent("poll"))
+        }, parseInt(elt.getAttribute("ext-fx-poll-interval")))
+    })
+  }
+})
+```
+```html
+<h3>Live News</h3>
+<div fx-action="/news" fx-trigger="poll" ext-fx-poll-interval="300">
+  ... initial content ...
+</div>
+```
+
+### Server Sent Events
+
+For [SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)-based swaps,
+reach for [ssexi.js](https://github.com/bigskysoftware/ssexi), the fixi-project SSE companion.
+It hooks into fixi's `fx:config` event and streams responses with
+`Content-Type: text/event-stream` directly into the target as each message arrives:
+
+```html
+<script src="fixi.js"></script>
+<script src="ssexi.js"></script>
+
+<button fx-action="/stream" fx-swap="beforeend" fx-target="#log">Start</button>
+<div id="log"></div>
+```
+
+On the server, a message is any SSE `data:` frame containing HTML:
+
+```
+data: <p>First update</p>
+
+data: <p>Second update</p>
+
+```
+
+ssexi also supports named events, JSON-targeted events, `cfg.sseReconnect` for automatic
+reconnection with `Last-Event-ID`, and `cfg.ssePauseOnHidden` to pause when the tab is
+hidden. See the [ssexi README](https://github.com/bigskysoftware/ssexi) for details.
+
+If you'd rather roll your own, fixi's `fx:config` event gives you all the hooks you need;
+the [ssexi source](https://github.com/bigskysoftware/ssexi/blob/main/ssexi.js) is a short
+reference implementation.
+
+### Confirmation
+
+This extension implements a simple `confirm()` based confirmation if the `ext-fx-confirm` attribute is found.  Note that
+it does not use a Promise, just the regular old blocking `confirm()` function
+
+```js
+// fixi confirmation extension
+document.addEventListener("fx:config", (evt)=>{
+    var confirmationMessage = evt.target.getAttribute("ext-fx-confirm")
+    if (confirmationMessage){
+        evt.detail.cfg.confirm = ()=>confirm(confirmationMessage)
+    }
+})
+```
+```html
+<button fx-action="/demo" fx-method="delete" ext-fx-confirm="Are you sure?">
+    Delete It
+</button>
+```
+
+### Relative Selectors
+
+This extension implements relative selectors for the `fx-target` attribute.
+
+```js
+// fixi relative selectors extension
+document.addEventListener('fx:config', (evt)=>{
+    console.log("here")
+    var target = evt.target.getAttribute("fx-target") || ""
+    if (target.indexOf("closest ") == 0){
+        evt.detail.cfg.target = evt.target.closest(target.substring(8))
+    } else if (target.indexOf("find ") == 0){
+        evt.detail.cfg.target = evt.target.querySelector(target.substring(5))
+    } else if (target.indexOf("next ") == 0){
+        var matches = Array.from(document.querySelectorAll(target.substring(5)))
+        evt.detail.cfg.target = matches.find((elt) => evt.target.compareDocumentPosition(elt) === Node.DOCUMENT_POSITION_FOLLOWING)
+    } else if (target.indexOf("previous ") == 0){
+        var matches = Array.from(document.querySelectorAll(target.substring(9))).reverse()
+        evt.detail.cfg.target = matches.find((elt) => evt.target.compareDocumentPosition(elt) === Node.DOCUMENT_POSITION_PRECEDING)
+    }
+})
+```
+```html
+<button fx-action="/demo" fx-target="next output">
+    Get Data
+</button>
+<output></output>
+```
+
+### Intersection Events
+
+fixi does not trigger events when elements become visible like htmx does, but you can implement this behavior with the
+following extension.  It adds an [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)
+for every element with the `intersect` trigger and wires it in to trigger that event once the element intersects
+the viewport.  
+
+```js
+// fixi intersection events extension
+document.addEventListener("fx:init", (evt) => {
+    let trigger = evt.target.getAttribute("fx-trigger")
+    if(trigger === "intersect") {
+        let obs = evt.target.__fixi_ob = new IntersectionObserver((entries)=>{
+            for(const entry of entries) {
+                if (entry.isIntersecting){
+                    // done observing, remove
+                    obs.unobserve(evt.target)
+                    evt.target.__fixi_ob = null;
+                    // trigger event
+                    evt.target.dispatchEvent(new CustomEvent("intersect"))
+                    return;
+                }
+            }
+        })
+        obs.observe(evt.target)
+    }
+})
+```
+
+With this extension it is possible to implement the [infinite scroll](https://htmx.org/examples/infinite-scroll/)
+example:
+
+```html
+<tr fx-action="/contacts/?page=2"
+    fx-trigger="intersect"
+    fx-swap="afterend">
+  <td>Agent Smith</td>
+  <td>void29@null.org</td>
+  <td>55F49448C0</td>
+</tr>
+```
+
+### Custom Swapping Algorithms
+
+For DOM morphing specifically, the fixi-project ships
+[paxi.js](https://github.com/bigskysoftware/paxi), which registers itself as the `morph`
+swap strategy for you:
+
+```html
+<script src="fixi.js"></script>
+<script src="paxi.js"></script>
+
+<button fx-action="/demo" fx-swap="morph" fx-target="#output">Morph New Content</button>
+<output id="output"></output>
+```
+
+More generally, you can implement any custom swap strategy using the
+[`fx:config`](#fxconfig) event, wiring a function into `evt.detail.cfg.swap`. Here is an
+example that wires in [Idiomorph](https://github.com/bigskysoftware/idiomorph) for the
+`morph` & `innerMorph` values (paxi does something similar in a smaller package):
+
+```js
+// fixi morphing extension
+document.addEventListener("fx:config", (evt) => {
+  function morph(cfg, style) {
+    Idiomorph.morph(cfg.target, cfg.text, { morphStyle: style }).forEach((n) => {
+      // process nodes as morphing existing nodes will not trigger fixi MutationObserver
+      n.dispatchEvent(new CustomEvent("fx:process", { bubbles: true }));
+    });
+  }
+  if (evt.detail.cfg.swap == "morph")
+    evt.detail.cfg.swap = (cfg) => morph(cfg, "outerHTML");
+  if (evt.detail.cfg.swap == "innerMorph")
+    evt.detail.cfg.swap = (cfg) => morph(cfg, "innerHTML");
+});
+```
+
+### Implementing Attribute Inheritance
+
+fixi does not implement [attribute inheritance](https://htmx.org/docs/#inheritance) like htmx does, but you can modify 
+the fixi source to do so easily.
+
+Simply change this line:
+```js
+    let attr = (elt, name, defaultVal)=>elt.getAttribute(name) || defaultVal
+```
+to this:
+```js
+    let attr = (elt, name, defaultVal)=>elt.closest(`[${name}]`)?.getAttribute(name) || defaultVal
+```
+
+### Implementing History Support
+
+fixi does not implement history support, but you can add rudimentary support like so:
+
+```js
+    function initJS() {
+      // initialize javascript things here
+    }
+    document.addEventListener("DOMContentLoaded", (evt)=>{
+        initJS();
+    });
+    document.addEventListener("fx:after", (evt)=>{
+        if (evt.target.hasAttribute("ext-fx-push")){
+            history.replaceState({fixi:true, url:location.href}, "", location.href)
+            history.pushState({fixi:true, url:evt.detail.cfg.response.url}, "", evt.detail.cfg.response.url)
+        }
+    })
+    window.addEventListener("popstate", async(evt)=>{
+        if (evt.state.fixi){
+            let historyResp = await fetch(evt.state.url)
+            document.documentElement.innerHTML = await historyResp.text()
+            document.dispatchEvent(new CustomEvent("fx:process"))
+            initJS()
+        }
+    })
+```
+
+This adds an event listener for the `fx:after` event, and if the element has the `ext-fx-push` attribute it uses the
+[JavaScript History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to update the URL in the browser.
+
+Note that, like with htmx, this mechanism expects that remote systems will return full pages when the given URL is
+requested, so that things like refresh will work properly.  Note also that scripts in head tags that are swapped in
+by fixi are _not_ executed by default, which is the browser standard for whatever reason.
+
+With this extension, you can write code like this:
+
+```html
+<a href="/example.html"
+   fx-action="/example.html"
+   fx-target="html"
+   ext-fx-push>
+    Example Fixi-Powered Link
+</a>
+```
+
+And fixi will handle the click on this link, and the URL of the site will properly update, assuming JavaScript is 
+enabled.
+
+More sophisticated History handling (in particular, `head` tag handling) is left as an exercise for the reader.
+
+## LICENCE
+
+```
+Zero-Clause BSD
+=============
+
+Permission to use, copy, modify, and/or distribute this software for
+any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE
+FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+
+<h2>&#x1f480; <i>Memento Mori</i></h2>
+
+```js
+/**
+* Adding a single line to this file requires great internal reflection
+* and thought.  You must ask yourself if your one line addition is so
+* important, so critical to the success of the company, that it warrants
+* a slowdown for every user on every page load.  Adding a single letter
+* here could cost thousands of man hours around the world.
+* 
+* That is all.
+*/
+```
+
+-- [A comment](https://www.youtube.com/watch?v=wHlyLEPtL9o&t=1528s) at the beginning of [Primer](https://gist.github.com/makinde/376039)
+
+
+# moxi.js
+
+<h1>&#x1F94A; moxi.js - <i>just a little more...</i></h1>
+
+moxi.js is an experimental, minimalist companion to [fixi.js](https://github.com/bigskysoftware/fixi) that
+lets you put small bits of behavior directly on HTML elements: event handlers, reactive
+expressions & a compact query helper.
+
+moxi is part of the [fixi project](https://fixiproject.org): fixi handles the network and swapping, moxi handles local
+interactivity.
+
+The two are designed to be used together, but moxi has no dependency on fixi and works fine on its own.
+
+The moxi api consists of two [attributes](#attributes), nine [event modifiers](#event-modifiers),
+three [globals plus a handler scope](#scope), and four [events](#events).
+
+Here is an example:
+
+```html
+<input id="name" placeholder="name">
+<output live="this.innerText = 'hello ' + q('#name').value"></output>
+<button on-click="q('#name').value = ''">clear</button>
+```
+
+When a user types into the `input`, the `output` updates automatically because the `live`
+attribute re-runs when the DOM or form state changes.
+
+The `button` clears the input when clicked, and the `output` updates again in response.
+
+## Installing
+
+moxi is designed to be easily [vendored](https://htmx.org/essays/vendoring/), that is, copied, into your project:
+
+```bash
+curl https://raw.githubusercontent.com/bigskysoftware/moxi/refs/tags/0.1.0/moxi.js >> moxi-0.1.0.js
+```
+
+The SHA256 of v0.1.0 is
+
+`mrpYW3yY45ec7RlIyDVCDx2/NnrZOQNB4v+OavwQo7Q=`
+
+generated by the following command line script:
+
+```bash
+cat moxi.js | openssl sha256 -binary | openssl base64
+```
+
+Alternatively can download the source from here:
+
+<https://github.com/bigskysoftware/moxi/archive/refs/tags/0.1.0.zip>
+
+You can also use the JSDelivr CDN for local development or testing:
+
+```html
+
+<script src="https://cdn.jsdelivr.net/gh/bigskysoftware/moxi@0.1.0/moxi.js"
+        crossorigin="anonymous"
+        integrity="sha256-mrpYW3yY45ec7RlIyDVCDx2/NnrZOQNB4v+OavwQo7Q="></script>
+```
+
+Finally, moxi is available on NPM as the [
+`@bigskysoftware/moxi-js`](https://www.npmjs.com/package/@bigskysoftware/moxi-js) package.
+
+If you use moxi with fixi, load `moxi.js` *before* `fixi.js`. moxi must register the `on-fx:init` and
+`on-fx:process` handlers before fixi sends those events on page load.
+
+## API
+
+### Attributes
+
+| attribute    | description                                                                                                                                        | example                                    |
+|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
+| `on-<event>` | Binds a handler for `<event>` on this element. Colons are allowed in the event name (e.g. `on-fx:after`).                                          | `on-click="q('#out').innerText = 'hi'"`    |
+| `on-init`    | Special case - runs once at bind time rather than registering an event listener. Useful for setup code that lives on the element itself.           | `on-init="this.dataset.ready = true"`      |
+| `live`       | An expression that is evaluated at bind time and re-evaluated whenever the DOM or form state changes. Great for reactive output.                   | `live="this.innerText = q('#name').value"` |
+| `mx-ignore`  | Any element with this attribute on it or on an ancestor will be skipped during processing - no `on-*` or `live` attributes on it will be wired up. |                                            |
+
+### Event Modifiers
+
+Modifiers are dot-separated and composable. They live between the event name and the `=`.
+For example, `on-click.prevent.stop="..."` will both `preventDefault()` and `stopPropagation()`
+before the body runs.
+
+| modifier   | description                                                                                                                                                                                                                                                             |
+|------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `.prevent` | Calls `event.preventDefault()` before the handler body runs.                                                                                                                                                                                                            |
+| `.stop`    | Calls `event.stopPropagation()` before the handler body runs.                                                                                                                                                                                                           |
+| `.halt`    | Equivalent to `.prevent.stop` - a shorthand for the common case.                                                                                                                                                                                                        |
+| `.once`    | Removes the listener after the first successful fire. Plays correctly with `.self` and `.outside` - skipped invocations don't consume the listener.                                                                                                                     |
+| `.self`    | Skips the handler when `event.target !== this`. Ignores bubbled events from children.                                                                                                                                                                                   |
+| `.capture` | Passes `{capture: true}` to `addEventListener`.                                                                                                                                                                                                                         |
+| `.passive` | Passes `{passive: true}` to `addEventListener`. Required for smooth scroll/touch handlers.                                                                                                                                                                              |
+| `.outside` | Attaches the listener to `document` instead of `this`, and only fires when the event happened outside the element. Useful for dismissing menus and modals.                                                                                                              |
+| `.cc`      | Camel-cases the event name. `on-my-event.cc` listens for `myEvent`. Useful when consuming custom events from libraries or web components that dispatch camelCase names, since HTML attribute names are lowercased by the parser and can't otherwise express mixed case. |
+
+### Scope
+
+moxi exposes three helpers on `globalThis`:
+
+| name             | type          | description                                                                                                                             |
+|------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| `q(x)`           | fn -> proxy   | Query helper. `x` can be a selector string, a single element, or any iterable of elements. See [The `q()` Helper](#the-q-helper) below. |
+| `wait(x)`        | fn -> Promise | If `x` is a number, resolves after `x` milliseconds. If it's a string, resolves with the event the next time an event named `x` fires.  |
+| `transition(fn)` | fn            | Wraps `fn` in `document.startViewTransition()`, with a fallback if unsupported.                                                         |
+
+Inside `on-*` and `live` bodies, four additional bindings are in scope:
+
+| name                             | type          | description                                                                                                                                              |
+|----------------------------------|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `this`                           | `Element`     | The element the attribute is on.                                                                                                                         |
+| `event`                          | `Event`       | Available in `on-*` handlers; undefined for `on-init` and `live`.                                                                                        |
+| `trigger(type, detail, bubbles)` | fn            | Dispatches a cancelable `CustomEvent` from `this`. `bubbles` defaults to `true`. From outside a handler, use `q(elt).trigger(...)` on the proxy instead. |
+| `debounce(ms)`                   | fn -> Promise | Per-handler debouncer - superseded calls never resolve. Use with `await`. Handler-scope only because it carries per-handler state.                       |
+
+`q()` directionals (`next`, `prev`, `closest`, `in this`) and `wait("event")` are
+context-aware: in a handler they resolve relative to `this`; called globally they
+resolve relative to `document.documentElement`.
+
+Handler bodies are compiled as **async functions** (via the `AsyncFunction` constructor), so
+`await` works anywhere.
+
+#### Bare-name access to `event.detail`
+
+For `on-*` handlers, every key on `event.detail` is also exposed as a top-level
+variable inside the handler body. So instead of writing
+
+```html
+
+<button on-fx:config="event.detail.cfg.confirm = () => confirm('Delete?')">delete</button>
+```
+
+you can drop the `event.detail.` prefix and write
+
+```html
+
+<button on-fx:config="cfg.confirm = () => confirm('Delete?')">delete</button>
+```
+
+Reads, mutations (`cfg.foo = ...`), and even reassignments (`cfg = {...}`) all hit the
+underlying `event.detail` object. If a handler updates `cfg.confirm` inside an
+`fx:config` listener, fixi sees the change. This is implemented with a `with` block
+around the handler body, so:
+
+* If `event.detail` is missing or null (e.g., a plain non-`CustomEvent`), nothing
+  is injected and the handler still runs.
+* Names that aren't on `event.detail` resolve normally to `this`, `event`, `trigger`,
+  `debounce`, the global helpers (`q`, `wait`, `transition`), or any other binding.
+* Assignments to a name that *isn't* already a property of `event.detail` fall
+  through to the outer scope, so they don't accidentally pollute `detail`.
+
+### The `q()` Helper
+
+`q(x)` returns a proxy over matched elements. `x` is most often a selector string, but
+can also be a single `Element` (wrapped) or any iterable of elements (e.g. a `NodeList`
+or `Array`). When given a string, the grammar is:
+
+```
+[<direction> ]<css-selector>[ in (this | <scope-selector>)]
+```
+
+#### Directions
+
+| direction   | result                                                                       |
+|-------------|------------------------------------------------------------------------------|
+| _(none)_    | All elements matching the selector in the scope (default scope: `document`). |
+| `next X`    | The first `X` after `this` in document order.                                |
+| `prev X`    | The last `X` before `this` in document order.                                |
+| `closest X` | The same as `this.closest(X)`.                                               |
+| `first X`   | The first `X` in the scope.                                                  |
+| `last X`    | The last `X` in the scope.                                                   |
+
+#### Scoping with `in`
+
+* `q('.row in this')` - scopes the query to `this`
+* `q('.row in #panel')` - scopes the query to the element matching `#panel`
+* If the scope selector matches nothing, `q` returns an empty proxy (no throw).
+
+#### The Proxy
+
+The object returned by `q()` is a `Proxy` that fans reads, writes, and method calls across
+every matched element:
+
+| operation                               | behavior                                                                                                                                                                                |
+|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `q(...).prop = v`                       | Sets `prop = v` on every match, then triggers a `live` recompute so reactive blocks reading those properties update automatically.                                                       |
+| `q(...).method(...)`                    | Calls `method` on every match. Returns the result from the first match - so value-returning methods like `checkValidity()` or `getAttribute()` work naturally.                          |
+| `q(...).prop` (object)                  | Returns a new proxy over `[e1.prop, e2.prop, ...]`, so nested access like `q('.row').classList.add('sel')` and `q('.row').style.color = 'red'` works.                                   |
+| `q(...).prop` (primitive or function)   | Returns the value from the first match.                                                                                                                                                 |
+| `q(...).count`                          | Returns the number of matched elements.                                                                                                                                                 |
+| `q(...).arr()`                          | Returns the matched elements as a plain `Array`, so you can chain `.filter()`, `.map()`, etc. without spreading.                                                                        |
+| `q(...).trigger(type, detail, bubbles)` | Dispatches the event from every matched element. `bubbles` defaults to `true`.                                                                                                          |
+| `q(...).take(cls, from)`                | Removes `cls` from every element matching `from` (a selector string or iterable of elements), then adds it to every matched element. Perfect for active-tab / active-nav patterns.      |
+| `q(...).insert(pos, html)`              | Parses `html` and inserts it at every matched element. `pos` is one of `'before'` / `'start'` / `'end'` / `'after'` - a friendlier spelling of the four `insertAdjacentHTML` positions. |
+| `for (let e of q(...))` / `[...q(...)]` | Iterates over the raw matched elements.                                                                                                                                                 |
+
+### Events
+
+moxi fires three lifecycle events. All are dispatched on the element being processed; listen
+on the `document` for global hooks.
+
+| event        | description                                                                                                                                                                                                                                                                        |
+|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mx:init`    | Fired just before moxi initializes an element. Cancelable - calling `preventDefault()` will skip binding that element.                                                                                                                                                             |
+| `mx:inited`  | Fired after the element has been fully initialized. Does not bubble.                                                                                                                                                                                                               |
+| `mx:process` | moxi listens for this event on the `document` and will process the `evt.target` and its descendants. Dispatch this to force re-scanning after manual DOM changes.                                                                                                                  |
+| `refresh`    | moxi listens for this bubbling event on the `document` and re-runs every `live` expression. Dispatch it (e.g. via `trigger('refresh')` from a handler or `document.dispatchEvent(new Event('refresh'))`) when state outside the DOM changes and you want live blocks to recompute. |
+
+### Properties
+
+| property             | description                                                                                                                                                                       |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `document.__moxi_mo` | The `MutationObserver` that moxi uses to auto-process newly added elements and to drive reactivity. You can `disconnect()` it temporarily for performance during large mutations. |
+| `elt.__moxi`         | An object mapping event names to the handlers moxi wired up on this element. Useful for debugging and for manually removing listeners.                                            |
+
+## Modus Operandi
+
+moxi's entry point is at the bottom of [moxi.js](moxi.js). On `DOMContentLoaded` it:
+
+1. Starts a `MutationObserver` watching the document for added nodes, attribute changes,
+   character data changes, and text child changes.
+2. Adds capturing document-level listeners for `input` and `change` to drive reactivity.
+3. Processes the existing body.
+
+### Discovery
+
+moxi finds elements using a single XPath query:
+
+```
+descendant-or-self::*[@live or @*[starts-with(name(),'on-')]]
+```
+
+That is - anything with a `live` attribute, or any attribute name starting with `on-`. XPath
+means moxi only visits elements it actually needs to wire up, rather than iterating every
+descendant.
+
+### `on-*` Handlers
+
+For each `on-<event>[.<mod>...]` attribute, moxi compiles the attribute value into an async
+function with the handler scope described above, then attaches it as an event listener. The
+attribute name after the `on-` prefix is the event name (colons allowed), optionally followed
+by dot-separated modifiers.
+
+If the event name is the literal string `init`, moxi invokes the function immediately instead
+of registering a listener.
+
+### `live` Expressions
+
+For each `live` attribute, moxi compiles the value into an async function, runs it once, and
+adds it to a global set of reactive expressions. Whenever the `MutationObserver` sees a
+change, or the capturing `input`/`change` listener fires, every live expression is re-run.
+
+To avoid runaway self-mutation cycles, moxi guards recompute behind a `pending` flag cleared
+on the next macrotask - so a live expression writing to the DOM will, at worst, settle in two
+ticks rather than cycle forever.
+
+Live expressions whose element has been removed from the DOM are removed from the run set on
+the next invocation (they detect `!elt.isConnected` and clean up).
+
+### Pairing with fixi
+
+moxi and [fixi](https://github.com/bigskysoftware/fixi) compose cleanly. Because moxi listens
+for events via `on-*`, you can react to fixi's lifecycle events with an ordinary handler:
+
+```html
+
+<div fx-action="/data" on-fx:after="q('closest section').classList.add('loaded')">
+    ...
+</div>
+```
+
+or trigger a fixi request from a moxi handler by dispatching from the proxy:
+
+```html
+
+<button on-click="q('#target').trigger('refresh')">Reload</button>
+<div id="target" fx-action="/data" fx-trigger="refresh">...</div>
+```
+
+## Examples
+
+### Reactive Output
+
+```html
+<input id="name" placeholder="type something">
+<output live="this.innerText = 'hello ' + (q('#name').value || 'stranger')"></output>
+```
+
+### Click Counter
+
+```html
+
+<button on-init="this.count = 0"
+        on-click="this.count++; q('next output').value = this.count">click me
+</button>
+<output>0</output>
+```
+
+### Active Tab With `take()`
+
+```html
+
+<nav>
+    <button class="tab active" on-click="q(this).take('active', '.tab')">One</button>
+    <button class="tab" on-click="q(this).take('active', '.tab')">Two</button>
+    <button class="tab" on-click="q(this).take('active', '.tab')">Three</button>
+</nav>
+```
+
+### Debounced Search
+
+```html
+<input on-input="await debounce(250); q('next output').innerText = 'searching ' + this.value">
+<output></output>
+```
+
+### View Transition on Toggle
+
+```html
+<button on-click="transition(() => q('#panel').classList.toggle('open'))">toggle</button>
+<div id="panel">...</div>
+```
+
+### Click-Outside-To-Dismiss
+
+```html
+
+<button on-click="q('#menu').hidden = false">open menu</button>
+<div id="menu" hidden on-click.outside="this.hidden = true">
+    Menu contents...
+</div>
+```
+
+### Parent-Listens-For-Child-Emits
+
+```html
+
+<dialog on-confirm="alert('confirmed: ' + event.detail)">
+    <button on-click="trigger('confirm', 'yes')">yes</button>
+    <button on-click="trigger('confirm', 'no')">no</button>
+</dialog>
+```
+
+## LICENCE
+
+```
+Zero-Clause BSD
+=============
+
+Permission to use, copy, modify, and/or distribute this software for
+any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE
+FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+# ssexi.js
+
+<h1>&#x1F4E1; ssexi.js - <i>streaming HTML & events for fixi.js</i></h1>
+
+ssexi is a companion library for [fixi.js](https://github.com/bigskysoftware/fixi) that adds automatic
+[Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) (SSE) support.
+
+Part of the [fixi project](https://fixiproject.org).
+
+When a fixi `fetch()` returns a response with `Content-Type: text/event-stream`, ssexi takes over and
+streams HTML into the target element as messages arrive.
+
+Here is an example:
+
+```html
+
+<script src="fixi.js"></script>
+<script src="ssexi.js"></script>
+
+<button fx-action="/stream"
+        fx-swap="beforeend"
+        fx-target="#output">
+    Start Stream
+</button>
+<div id="output"></div>
+```
+
+When the button is clicked, fixi issues a `GET` to `/stream`. If the server responds with
+`Content-Type: text/event-stream`, ssexi parses the SSE stream and swaps each message's `data` into the
+`#output` div, appending via `beforeend`.
+
+No special attributes are needed; ssexi detects SSE responses automatically.
+
+## Minimalism
+
+ssexi shares [fixi's](https://github.com/bigskysoftware/fixi) philosophy of radical minimalism. It adds SSE streaming
+support in a single file with no additional attributes, no configuration, and no dependencies beyond fixi itself.
+
+Like fixi, ssexi takes advantage of modern JavaScript features:
+
+* [`async` generators](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function*)
+  for parsing SSE streams
+* The [Streams API](https://developer.mozilla.org/en-US/docs/Web/API/Streams_API) via `ReadableStream.getReader()`
+* [`TextDecoder`](https://developer.mozilla.org/en-US/docs/Web/API/TextDecoder) for streaming byte-to-text decoding
+
+A hard constraint is that the *unminified, uncompressed* size of ssexi.js stays below the
+minified + gzipped size of [preact](https://bundlephobia.com/package/preact). Current sizes
+are listed on the [fixi project site](https://fixiproject.org).
+
+The ssexi project consists of four files:
+
+* [`ssexi.js`](ssexi.js), the code for the library
+* [`test.html`](test.html), the test suite for the library
+* This [`README.md`](README.md), which is the documentation
+* [`npm.sh`](npm.sh), which generates npm releases of the library
+
+## Installing
+
+ssexi is designed to be easily [vendored](https://htmx.org/essays/vendoring/), that is, copied, into your project
+alongside your copy of fixi:
+
+```bash
+curl https://raw.githubusercontent.com/bigskysoftware/ssexi/refs/heads/master/ssexi.js >> ssexi.js
+```
+
+You can also use the JSDelivr CDN for local development or testing:
+
+```html
+
+<script src="https://cdn.jsdelivr.net/gh/bigskysoftware/ssexi@master/ssexi.js"></script>
+```
+
+Finally, ssexi is available on NPM as the [`@bigskysoftware/ssexi-js`](https://www.npmjs.com/package/@bigskysoftware/ssexi-js) package.
+
+## Support
+
+You can get support for ssexi via:
+
+* [Github Issues](https://github.com/bigskysoftware/ssexi/issues)
+* [The htmx Discord `#fixi` channel](https://htmx.org/discord)
+
+## Modus Operandi
+
+ssexi is implemented as a single `fx:config` event listener. I encourage you to look at
+[the source](ssexi.js); it is short enough to read in a few minutes.
+
+### Integration With fixi
+
+When fixi fires the [`fx:config`](https://github.com/bigskysoftware/fixi#fxconfig) event, ssexi wraps the `cfg.fetch`
+function. The wrapper calls the real `fetch()`, checks the `Content-Type` header of the response, and if it contains
+`text/event-stream`, ssexi takes over:
+
+1. An [`fx:sse:open`](#fxsseopen) event is fired on the target element
+2. The response body is read as a stream and parsed according to the
+   [SSE specification](https://html.spec.whatwg.org/multipage/server-sent-events.html#event-stream-interpretation)
+3. For each message, an [`fx:sse:message`](#fxssemessage) event is fired
+4. **Unnamed messages** (no `event:` field) have their `data` swapped into the target element
+5. **Named messages** (with `event:` field) are dispatched as [`fx:sse:{eventName}`](#fxsseeventname) events and are
+   **not** swapped
+6. When the stream ends, an [`fx:sse:close`](#fxsseclose) event is fired
+
+If the response is not `text/event-stream`, it passes through to fixi untouched.
+
+### Accept Header
+
+Loading ssexi sets a default `Accept: text/html, text/event-stream` header on every fixi
+request, so that backends doing content negotiation can decide whether to return a one-shot
+HTML fragment or an SSE stream from the same URL.  The header is added with `??=`, so any
+`Accept` you've already set (in an `fx:config` listener, or via `window.fixiCfg.headers`)
+wins:
+
+```js
+elt.addEventListener('fx:config', (e) => {
+    // overrides ssexi's default for this element
+    e.detail.cfg.headers.Accept = 'text/event-stream'
+})
+```
+
+`text/html` is always listed so auth redirects, error pages, and HTML-only endpoints keep
+working unchanged.  Servers that don't look at `Accept` are unaffected.
+
+### SSE Parsing
+
+ssexi implements a compliant SSE parser as an async generator. It handles:
+
+* Line endings: `\r\n`, `\r`, or `\n`
+* Comments (lines starting with `:`)
+* Multi-line `data` fields (joined with `\n`)
+* The `event`, `id`, and `retry` fields
+* Chunked delivery (partial lines buffered across reads)
+
+### The `cfg.sse` Object
+
+When ssexi detects an SSE response, it creates a `cfg.sse` object on the fixi config with the following properties:
+
+* `lastEventId` - the `id` of the most recently received message (updated as messages arrive)
+* `retry` - the most recent `retry:` value from the server (in milliseconds), or `null`
+* `reader` - the
+  [`ReadableStreamDefaultReader`](https://developer.mozilla.org/en-US/docs/Web/API/ReadableStreamDefaultReader)
+  for the response body
+
+These properties are available in all ssexi events and provide the plugin points needed to implement
+[reconnection](#reconnection), [background disconnecting](#background-tab-handling), and
+[stream cancellation](#cancelling-via-the-reader):
+
+```js
+target.addEventListener("fx:sse:close", (evt) => {
+    let {lastEventId, retry} = evt.detail.cfg.sse
+    // use lastEventId and retry to implement reconnection logic
+})
+```
+
+```js
+target.addEventListener("fx:sse:open", (evt) => {
+    let reader = evt.detail.cfg.sse.reader
+    // store reader reference for later cancellation
+})
+```
+
+### Swapping
+
+For SSE responses, ssexi uses the `fx-swap` value from fixi's config.
+
+Common swap styles for SSE:
+
+| `fx-swap`    | behavior                                                                               |
+|--------------|----------------------------------------------------------------------------------------|
+| `innerHTML`  | Each message **replaces** the target's content (good for progressive rendering)        |
+| `beforeend`  | Each message is **appended** to the target (good for chat, feeds, logs)                |
+| `afterbegin` | Each message is **prepended** to the target                                            |
+| `outerHTML`  | First message **replaces** the target element, subsequent messages **append after** it |
+
+#### `outerHTML` Behavior
+
+When `fx-swap` is `outerHTML` (fixi's default), ssexi handles it specially for streaming:
+
+1. The **first** message replaces the target element via `outerHTML`, just as fixi normally would
+2. **Subsequent** messages are appended after the replaced content via `afterend`
+3. An internal anchor element is used to track the insertion point and is removed when the stream ends
+
+This means the original target element is replaced by the first message's HTML, and subsequent messages accumulate
+after it. Because the original target is replaced, ssexi events after the first message will bubble through the
+anchor's parent rather than the original target; listen on a parent element or `document` when using `outerHTML`:
+
+```js
+document.addEventListener("fx:sse:message", (evt) => {
+    console.log("message:", evt.detail.message.data)
+})
+```
+
+You can also set `cfg.sseSwap` in the `fx:config` event to use a different swap style for SSE than for normal
+responses:
+
+```js
+document.addEventListener("fx:config", (evt) => {
+    evt.detail.cfg.sseSwap = "beforeend"
+})
+```
+
+#### Routing One Stream To Multiple Targets
+
+An SSE message's `event:` field is normally a name (and dispatches `fx:sse:{name}` without
+swapping; see [`fx:sse:{eventName}`](#fxsseeventname)). As a special case, if the `event:`
+value parses as JSON, ssexi treats it as a per-message override of the swap parameters.
+All fields are optional:
+
+| field        | default                          | effect                                                    |
+|--------------|----------------------------------|-----------------------------------------------------------|
+| `target`     | `cfg.target`                     | CSS selector for where this message's data is swapped     |
+| `swap`       | `cfg.sseSwap` / `cfg.swap`       | Swap style for this message (`innerHTML`, `beforeend`, ...) |
+| `transition` | none                             | If truthy, wrap this swap in `document.startViewTransition` |
+
+```
+event: {"target":"#clock"}
+data: 12:34:56
+
+event: {"target":"#log","swap":"beforeend"}
+data: <div class="line">user signed in</div>
+
+event: {"transition":true}
+data: <p>same target, but morphed via a view transition</p>
+
+```
+
+This lets one SSE connection fan out to several panels at once, each with its own swap
+mode. `target` is resolved with `document.querySelector`; if it doesn't match anything
+the message is dropped silently.
+
+The JSON must start with `{` to be recognised; anything else is treated as a regular
+named event and dispatched without swapping.
+
+### Transitions
+
+ssexi does **not** wrap every swap in a [View
+Transition](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API). View
+transitions don't queue (a new one cancels the previous one's `.finished` promise), so
+wrapping each frame of a streamed response would either serialise the stream into
+multi-second sequences or strand a transition mid-flight. The default is plain swaps;
+reach for ordinary CSS transitions on the swapped content for continuous animations.
+
+For occasional, deliberate moments where a view transition *is* what you want, set
+`{"transition": true}` in a JSON event (see the routing table above). ssexi will
+`await cfg.transition(swap).finished` for that single message before reading the next
+one, so the rest of the stream stays paused while the transition plays. Use it sparingly
+on slow-moving streams; firing transition messages back-to-back will still cause earlier
+ones to abort.
+
+## Events
+
+ssexi fires the following events on the **target element**. All events bubble, are composed, and are cancelable.
+
+| event | detail | description |
+| --- | --- | --- |
+| [`fx:sse:open`](#fxsseopen) | `cfg`, `response` | Fired when an SSE stream is detected. Cancel to prevent processing. |
+| [`fx:sse:message`](#fxssemessage) | `cfg`, `message` | Fired for every SSE message _before_ swapping. Cancel to stop the stream. |
+| [`fx:sse:swapped`](#fxsseswapped) | `cfg`, `message` | Fired _after_ a message's content has been swapped into the target. Use this for post-swap reactions like auto-scroll. |
+| [`fx:sse:{eventName}`](#fxsseeventname) | `cfg`, `message` | Fired for messages with an `event:` field. These are **not** swapped. |
+| [`fx:sse:close`](#fxsseclose) | `cfg` | Fired when the stream ends normally. |
+| [`fx:sse:error`](#fxsseerror) | `cfg`, `error` | Fired if an error occurs during streaming. |
+
+### `fx:sse:open`
+
+Fired on the target element when a response with `Content-Type: text/event-stream` is detected. The `evt.detail`
+contains `cfg` (the fixi config object) and `response` (the fetch Response).
+
+If you call `preventDefault()` on this event, the stream will not be processed and the target will not be modified.
+
+### `fx:sse:message`
+
+Fired for **every** SSE message (both named and unnamed). The `evt.detail.message` object has the following
+properties:
+
+* `data` - the message data (multi-line `data:` fields joined with `\n`)
+* `event` - the event name (empty string if unnamed)
+* `id` - the message id (empty string if not set)
+* `retry` - the reconnection delay in milliseconds (if a `retry:` field was present), or `null`
+
+If you call `preventDefault()` on this event, the stream will stop processing (the current message will not be
+swapped or dispatched, and no further messages will be read).
+
+You can also use this event to modify the message data before it is swapped:
+
+```js
+target.addEventListener("fx:sse:message", (evt) => {
+    evt.detail.message.data = markdown(evt.detail.message.data)
+})
+```
+
+### `fx:sse:swapped`
+
+Fired on the target element **after** an unnamed message's `data` has been swapped in.
+The `evt.detail` is the same shape as `fx:sse:message` (`cfg`, `message`), but at this
+point the new content is already in the DOM, so reading layout properties returns post-swap
+values. Useful for auto-scroll, syntax-highlighting newly streamed code, etc.:
+
+```html
+<div id="log" on-fx:sse:swapped="this.scrollTop = this.scrollHeight"></div>
+```
+
+Not fired for named events (which aren't swapped) or for cancelled `fx:sse:message` events.
+
+### `fx:sse:{eventName}`
+
+When an SSE message has an `event:` field, ssexi dispatches a custom event with that name prefixed by `fx:sse:`.
+For example, a message with `event: status` will fire `fx:sse:status` on the target element.
+
+Named events are **not** swapped into the DOM; they are for JavaScript handling:
+
+```js
+target.addEventListener("fx:sse:status", (evt) => {
+    console.log("status update:", evt.detail.message.data)
+})
+```
+
+### `fx:sse:close`
+
+Fired when the SSE stream ends normally (the server closes the connection).
+
+### `fx:sse:error`
+
+Fired if an error occurs during stream processing. The `evt.detail.error` property contains the thrown value.
+
+## Server Side
+
+Your server endpoint should respond with `Content-Type: text/event-stream` and send
+[SSE-formatted](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#event_stream_format)
+messages:
+
+```
+data: <p>First update</p>
+
+data: <p>Second update</p>
+
+event: done
+data: finished
+
+```
+
+Each message is one or more `data:` lines followed by a blank line. Messages without an `event:` field will have their
+`data` swapped into the target. Messages with an `event:` field will be dispatched as DOM events.
+
+### Example: Python/Flask
+
+```python
+from flask import Flask, Response
+import time
+
+app = Flask(__name__)
+
+
+@app.route('/stream')
+def stream():
+    def generate():
+        for i in range(5):
+            yield f"data: <p>Message {i + 1}</p>\n\n"
+            time.sleep(1)
+        yield "event: done\ndata: finished\n\n"
+
+    return Response(generate(), content_type='text/event-stream')
+```
+
+### Example: Node/Express
+
+```javascript
+app.get('/stream', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream')
+    res.setHeader('Cache-Control', 'no-cache')
+    let i = 0
+    let interval = setInterval(() => {
+        if (++i > 5) {
+            res.write('event: done\ndata: finished\n\n')
+            res.end()
+            clearInterval(interval)
+        } else {
+            res.write(`data: <p>Message ${i}</p>\n\n`)
+        }
+    }, 1000)
+})
+```
+
+## Examples
+
+### Streaming Chat
+
+```html
+
+<form fx-action="/chat" fx-method="POST"
+      fx-swap="beforeend" fx-target="#messages">
+    <input name="message" placeholder="Type a message...">
+    <button>Send</button>
+</form>
+<div id="messages"></div>
+```
+
+Each SSE message from the server appends a new HTML fragment to the `#messages` div.
+
+### Progressive Rendering
+
+```html
+
+<button fx-action="/render" fx-swap="innerHTML" fx-target="#content">
+    Load Content
+</button>
+<div id="content">Click to load...</div>
+```
+
+Each SSE message replaces the content of `#content`, allowing the server to progressively refine the output.
+
+### Closing a Stream on a Named Event
+
+```html
+
+<div id="feed"></div>
+<script>
+    document.getElementById("feed").addEventListener("fx:sse:done", (evt) => {
+        console.log("stream complete")
+    })
+</script>
+<button fx-action="/feed" fx-swap="beforeend" fx-target="#feed">
+    Start Feed
+</button>
+```
+
+When the server sends `event: done`, the `fx:sse:done` event fires on the target. The stream continues to
+completion naturally; the named event is simply dispatched for your code to react to.
+
+### Stopping a Stream Early
+
+You can stop processing a stream by canceling the `fx:sse:message` event:
+
+```html
+
+<button fx-action="/long-stream" fx-swap="beforeend" fx-target="#out">
+    Start
+</button>
+<button onclick="document.getElementById('out').dataset.stop = 'true'">
+    Stop
+</button>
+<div id="out"></div>
+<script>
+    document.getElementById("out").addEventListener("fx:sse:message", (evt) => {
+        if (evt.target.dataset.stop) evt.preventDefault()
+    })
+</script>
+```
+
+## Reconnection and Lifecycle
+
+ssexi supports three opt-in config flags for managing stream lifecycle. Set them in an
+`fx:config` listener (or on the returned cfg before the stream starts):
+
+| flag                          | behavior                                                                 |
+|-------------------------------|--------------------------------------------------------------------------|
+| `cfg.sseReconnect`            | On close or error, wait `sse.retry` ms (or 3000) and re-fetch with a `Last-Event-ID` header. |
+| `cfg.ssePauseOnHidden`        | Cancel the reader when `document.hidden`; resume (with `Last-Event-ID`) when visible. |
+| `cfg.sseDisconnectOnHidden`   | Close the stream when `document.hidden`. No resume; the caller must re-trigger. |
+
+Example:
+
+```js
+btn.addEventListener("fx:config", (e) => {
+    e.detail.cfg.sseReconnect = true
+    e.detail.cfg.ssePauseOnHidden = true
+})
+```
+
+### `cfg.sse.close()`
+
+At any time you can stop the stream (and the reconnect loop) by calling `cfg.sse.close()`.
+It sets `cfg.sse.closed = true` and cancels the underlying reader:
+
+```js
+target.addEventListener("fx:sse:message", (e) => {
+    if (shouldStop(e.detail.message)) e.detail.cfg.sse.close()
+})
+```
+
+### Custom Reconnect Policy
+
+If the built-in reconnect doesn't match your needs (e.g. you want exponential backoff),
+leave `cfg.sseReconnect` off and implement your own in an `fx:sse:close` / `fx:sse:error`
+listener using `cfg.trigger` to re-fire the triggering event:
+
+```js
+document.addEventListener("fx:sse:close", (evt) => {
+    let cfg = evt.detail.cfg, elt = cfg.trigger.target
+    if (!elt.isConnected) return
+    let attempt = elt.__ssexiAttempt = (elt.__ssexiAttempt || 0) + 1
+    let delay = Math.min((cfg.sse?.retry || 500) * 2 ** (attempt - 1), 60000)
+    delay += delay * 0.3 * (Math.random() * 2 - 1) // jitter
+    setTimeout(() => elt.dispatchEvent(new Event(cfg.trigger.type)), delay)
+})
+```
+
+Note that cancelling the reader will cause an `fx:sse:error` event to fire (not `fx:sse:close`), since the stream
+did not end naturally. You can alternatively use `cfg.abort()` to abort the underlying fetch, which has the same
+effect.
+
+## Mocking
+
+You can mock SSE responses the same way you mock regular fixi responses, by replacing `cfg.fetch` in the
+`fx:config` event. The mock should return a `Response` with a `ReadableStream` body and
+`Content-Type: text/event-stream`:
+
+```js
+document.addEventListener("fx:config", (evt) => {
+    evt.detail.cfg.fetch = () => {
+        let encoder = new TextEncoder()
+        let messages = ["data: hello\n\n", "data: world\n\n"]
+        let i = 0
+        let stream = new ReadableStream({
+            pull(controller) {
+                if (i < messages.length)
+                    controller.enqueue(encoder.encode(messages[i++]))
+                else
+                    controller.close()
+            }
+        })
+        return Promise.resolve(
+            new Response(stream, {headers: {'Content-Type': 'text/event-stream'}})
+        )
+    }
+})
+```
+
+## LICENCE
+
+```
+Zero-Clause BSD
+=============
+
+Permission to use, copy, modify, and/or distribute this software for
+any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE
+FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+# paxi.js
+
+<h1>&#x267B;&#xFE0F; paxi.js - <i>a clever little diff...</i></h1>
+
+paxi.js is an experimental, minimalist companion to [fixi.js](https://github.com/bigskysoftware/fixi)
+that swaps HTML into the DOM by *morphing* instead of replacing: preserving existing nodes,
+focus, scroll position, and form state wherever the old and new trees align.
+
+Part of the [fixi project](https://fixiproject.org).
+
+When paired with fixi, paxi registers itself as the `morph` swap strategy, so you can write
+`fx-swap="morph"` and get id-keyed reconciliation out of the box. It also works stand-alone
+via the `window.morph(target, html)` global.
+
+Here is an example:
+
+```html
+<script src="fixi.js"></script>
+<script src="paxi.js"></script>
+
+<button fx-action="/profile"
+        fx-target="#profile"
+        fx-swap="morph">
+    Reload Profile
+</button>
+<div id="profile">
+    <input id="nickname" placeholder="typing here survives the swap">
+    <p id="bio">...</p>
+</div>
+```
+
+The response HTML replaces the contents of `#profile`, but the `<input>` keeps its focus,
+caret, and any in-progress value because its `id` matches a node in the incoming markup.
+
+## Minimalism
+
+paxi is to [idiomorph](https://github.com/bigskysoftware/idiomorph) what fixi is to htmx:
+a smaller, less ambitious take on the same idea. No configuration, no callbacks, no
+head-merging, no id-set inference - just a single recursive diff that keeps id-keyed
+nodes stable as the tree around them changes.
+
+As such, it does *not* include many features found in idiomorph or morphdom:
+
+* head merging / stylesheet reconciliation
+* `beforeNodeMorphed` / `afterNodeMorphed` callbacks
+* `outerHTML` vs `innerHTML` modes
+* id-set propagation across ancestors
+* pluggable node matchers
+
+A hard constraint on the project is that the *unminified, uncompressed* size stays under
+2KB.
+
+## Installing
+
+Drop `paxi.js` in a script tag after (or before) `fixi.js`:
+
+```html
+<script src="fixi.js"></script>
+<script src="paxi.js"></script>
+```
+
+Or install via npm:
+
+```
+npm install @bigskysoftware/paxi-js
+```
+
+## API
+
+### `window.morph(target, html)`
+
+Morph `target` (an `Element`) toward the first element parsed from `html` (a string). The
+target is updated in place when the root node names match; otherwise it is replaced.
+
+```js
+morph(document.getElementById("panel"), "<div id='panel'>new contents</div>")
+```
+
+### `fx-swap="morph"`
+
+When loaded alongside fixi, paxi registers a config hook that intercepts `fx-swap="morph"`
+and wires it to `morph(cfg.target, cfg.text)`.
+
+## Modus Operandi
+
+paxi walks the old and new trees in lockstep:
+
+1. If node type or name differ, the old node is replaced - but any id-keyed descendant of
+   the incoming node whose id matches a node in the old tree is first rescued into place.
+2. For text and comment nodes, the value is updated when it differs.
+3. For elements, attributes are synced (extras removed, missing added, values updated).
+4. Children are reconciled positionally, except that id-keyed children in the incoming
+   tree pull their original counterparts forward when they exist.
+
+## LICENCE
+
+```
+Zero-Clause BSD
+=============
+
+Permission to use, copy, modify, and/or distribute this software for
+any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE
+FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+# rexi.js
+
+<h1>&#x1F415; rexi.js - <i>a fluent little fetch...</i></h1>
+
+rexi.js is an experimental, minimalist fetch wrapper with HTTP-verb shortcuts, form
+serialization, chainable body parsers, and throw-on-error semantics. It's the JSON-side
+companion for the [fixi.js](https://github.com/bigskysoftware/fixi) family: for the times
+you do need to talk to an API from client code.
+
+Part of the [fixi project](https://fixiproject.org).
+
+Here is an example:
+
+```html
+<script src="rexi.js"></script>
+<script>
+    let me = await get("/api/me").json()
+    await post("/api/login", document.forms.login)          // form element
+    await post("/api/users", {name: "Ada"})                 // JSON body
+    await get("/search", {q: "hi"}, {include: "#filters"})  // query string + extra fields
+</script>
+```
+
+Six verb helpers (`get`, `head`, `post`, `put`, `patch`, `del`) are attached to
+`globalThis` for zero-ceremony use. Each returns a decorated `Promise<Response>` with
+`.json()`, `.text()`, `.blob()`, `.html()`, `.raw()`, and `.abort()` sugar so the common
+case is one `await`.
+
+## Minimalism
+
+rexi is deliberately tiny: no interceptor pipeline, no retry logic, no automatic base
+URL, no upload progress, no caching layer, no built-in download helper. If your app
+outgrows it, reach for [ky](https://github.com/sindresorhus/ky) or
+[wretch](https://github.com/elbywan/wretch).
+
+## Installing
+
+Drop `rexi.js` into a script tag:
+
+```html
+<script src="rexi.js"></script>
+```
+
+Or install via npm:
+
+```
+npm install @bigskysoftware/rexi-js
+```
+
+## API
+
+### Verbs
+
+All six verbs share the same shape:
+
+```
+get|head|post|put|patch|del(url, body?, opts?)
+```
+
+`del` is used instead of `delete` because bare `delete(x)` is a JavaScript syntax trap.
+Both `rexi.del` and `window.del` are exposed.
+
+### Body normalization
+
+The second positional arg is a logical "input". Its type decides the wire format:
+
+| Input                                     | Sent as                                            |
+|-------------------------------------------|----------------------------------------------------|
+| `FormData`                                | as-is                                              |
+| `HTMLFormElement`                         | `new FormData(el)`                                 |
+| single named input element                | `FormData` with one `[name, value]` entry          |
+| iterable of elements (e.g. moxi `q(...)`) | `FormData` collecting each element's `[name,value]`|
+| plain object                              | `JSON.stringify`, `Content-Type: application/json` |
+| `string` / `Blob` / `URLSearchParams` / `ArrayBuffer` | passed straight to fetch               |
+| `null` / `undefined`                      | no body                                            |
+
+### Method disposition
+
+By default `GET` / `HEAD` / `DEL` URL-encode the body into the query string (with
+repeating keys for array values), and `POST` / `PUT` / `PATCH` send it in the request
+body. Override with `opts.send: "query" | "body"`.
+
+### Options
+
+```js
+{
+  include: selector | Element | iterable | Array<any of those>,  // merge extra form fields
+  send:    "query" | "body",                                     // override method default
+  timeout: ms,                                                   // abort after N ms
+  signal:  AbortSignal,                                          // external cancel, chains in
+  headers: {...},                                                // merged with auto Content-Type
+  ...                                                            // passed through to fetch()
+}
+```
+
+`include` with a JSON body promotes the request to form mode (the JSON object is
+flattened into FormData entries).
+
+### Response helpers
+
+```js
+let p = get(url, body, opts)
+await p.json()   // parsed JSON
+await p.text()   // string
+await p.blob()   // Blob
+await p.html()   // DocumentFragment (parsed via <template>)
+await p.raw()    // the raw Response
+p.abort()        // cancel the underlying fetch
+```
+
+Non-2xx responses throw an `Error` carrying `.status` and `.response` (the raw
+Response, for bodies/headers).
+
+### Lifecycle events
+
+rexi dispatches two CustomEvents on `document`:
+
+* `rexi:before` - cancelable; `detail.cfg = {url, init}` can be mutated (e.g. to inject
+  an `Authorization` header). `preventDefault()` aborts the request with `AbortError`.
+* `rexi:after` - fires for every completed fetch (including non-2xx, before rexi
+  throws); `detail = {cfg, response}`.
+
+```js
+document.addEventListener("rexi:before", (e) => {
+    e.detail.cfg.init.headers.Authorization = `Bearer ${token}`
+})
+```
+
+## LICENCE
+
+```
+Zero-Clause BSD
+=============
+
+Permission to use, copy, modify, and/or distribute this software for
+any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE
+FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+

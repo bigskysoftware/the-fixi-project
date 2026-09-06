@@ -30,3 +30,7 @@
   label: Demo
   ico: "&#x1F4FC;"
   desc: How to see working examples
+- url: /llms.txt
+  label: llms.txt
+  ico: "&#x1F916;"
+  desc: All docs in one file for LLMs
