@@ -6,7 +6,7 @@ heading: '<span class="ico">&#x267B;&#xFE0F;</span> <code>paxi.js</code>: morphi
 
 ## Overview
 
-`paxi.js` is a miniature version of [idiomorph](https://github.com/bigskysoftware/idiomorph).
+[`paxi.js`](https://github.com/bigskysoftware/paxi) is a miniature version of [idiomorph](https://github.com/bigskysoftware/idiomorph).
 
 It swaps HTML into the DOM by *morphing* the old tree to match the new one instead of
 replacing it wholesale.

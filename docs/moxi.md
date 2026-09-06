@@ -6,7 +6,7 @@ heading: '<span class="ico">&#x1F94A;</span> <code>moxi.js</code>: inline script
 
 ## Overview
 
-`moxi.js` is the client-side scripting component of the fixi project, helping you write client-side enhancements to
+[`moxi.js`](https://github.com/bigskysoftware/moxi) is the client-side scripting component of the fixi project, helping you write client-side enhancements to
 your fixi-based applications. Like `fixi.js`, moxi focuses on using attributes to add behaviors to HTML elements.
 
 `moxi.js` can be used independently from `fixi.js`, but the two dovetail nicely.

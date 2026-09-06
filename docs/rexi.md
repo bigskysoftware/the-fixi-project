@@ -6,7 +6,7 @@ heading: '<span class="ico">&#x1F415;</span> <code>rexi.js</code>: a fluent fetc
 
 ## Overview
 
-`rexi.js` is a tiny fluent wrapper around the browser's `fetch` API.
+[`rexi.js`](https://github.com/bigskysoftware/rexi) is a tiny fluent wrapper around the browser's `fetch` API.
 
 It is useful when you want to issue HTTP requests in scripting contexts, rather than
 in fixi-driven contexts. Where fixi's job is "swap HTML returned by the server", rexi's

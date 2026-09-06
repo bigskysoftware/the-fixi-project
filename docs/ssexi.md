@@ -6,7 +6,7 @@ heading: '<span class="ico">&#x1F4E1;</span> <code>ssexi.js</code>: server-sent 
 
 ## Overview
 
-`ssexi.js` is a small companion to fixi that adds
+[`ssexi.js`](https://github.com/bigskysoftware/ssexi) is a small companion to fixi that adds
 [Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
 support: a long-lived HTTP stream where the server pushes HTML to the browser as things
 happen.

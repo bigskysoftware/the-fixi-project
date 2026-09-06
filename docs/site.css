@@ -348,13 +348,42 @@ main table.libs {
 
 main table.libs td:first-child {
     font-size: 1.4em;
+    white-space: nowrap;
+}
+
+main table.libs td:first-child .lib-ico {
+    display: inline-block;
+    width: 1.3em;
+    text-align: center;
+    vertical-align: middle;
 }
 
 main table.libs td:first-child a {
     font-size: 1rem;
+    vertical-align: middle;
 }
 
-main table.libs th:nth-child(1), main table.libs td:nth-child(1),
+main table.libs td:first-child a:first-of-type {
+    display: inline-block;
+    min-width: 4.4em;
+    margin: 0 0.3em;
+}
+
+main table.libs td:first-child a.src {
+    display: inline-block;
+    width: 0.9rem;
+    height: 0.9rem;
+    background-color: #444;
+    opacity: 0.7;
+    vertical-align: middle;
+    mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Cpath%20d='M8%200C3.58%200%200%203.58%200%208c0%203.54%202.29%206.53%205.47%207.59.4.07.55-.17.55-.38%200-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01%201.08.58%201.23.82.72%201.21%201.87.87%202.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95%200-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12%200%200%20.67-.21%202.2.82.64-.18%201.32-.27%202-.27s1.36.09%202%20.27c1.53-1.04%202.2-.82%202.2-.82.44%201.1.16%201.92.08%202.12.51.56.82%201.27.82%202.15%200%203.07-1.87%203.75-3.65%203.95.29.25.54.73.54%201.48%200%201.07-.01%201.93-.01%202.2%200%20.21.15.46.55.38A8.012%208.012%200%200016%208c0-4.42-3.58-8-8-8z'/%3E%3C/svg%3E") center / contain no-repeat;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2016%2016'%3E%3Cpath%20d='M8%200C3.58%200%200%203.58%200%208c0%203.54%202.29%206.53%205.47%207.59.4.07.55-.17.55-.38%200-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01%201.08.58%201.23.82.72%201.21%201.87.87%202.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95%200-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12%200%200%20.67-.21%202.2.82.64-.18%201.32-.27%202-.27s1.36.09%202%20.27c1.53-1.04%202.2-.82%202.2-.82.44%201.1.16%201.92.08%202.12.51.56.82%201.27.82%202.15%200%203.07-1.87%203.75-3.65%203.95.29.25.54.73.54%201.48%200%201.07-.01%201.93-.01%202.2%200%20.21.15.46.55.38A8.012%208.012%200%200016%208c0-4.42-3.58-8-8-8z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+main table.libs td:first-child a.src:hover {
+    opacity: 1;
+}
+
 main table.libs th:nth-child(2), main table.libs td:nth-child(2),
 main table.libs th:nth-child(3), main table.libs td:nth-child(3) {
     text-align: center;
