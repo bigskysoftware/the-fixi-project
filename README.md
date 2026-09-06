@@ -137,7 +137,8 @@ npm install         # installs playwright + terser (dev-only)
 npm run clone       # clones each sub-project repo into its directory
 npm test            # runs the full test suite across all libraries (headless)
 npm run build       # builds the all-in-one bundle into dist/
-npm run serve       # serves the project over http://localhost:8000
+npm run demo        # runs the demo app on http://localhost:8765
+npm run serve       # serves the docs site on http://localhost:4000
 ```
 
 `npm test` accepts a subset of project names, so `npm test rexi paxi` runs only those two.
