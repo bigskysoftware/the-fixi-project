@@ -11,6 +11,7 @@ clone the repo and start the [demo server](https://github.com/bigskysoftware/the
 git clone https://github.com/bigskysoftware/the-fixi-project.git
 cd the-fixi-project
 npm install
+npm run clone
 npm run demo
 ```
 
